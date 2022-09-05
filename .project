@@ -3,6 +3,7 @@
 	<name>metaporter</name>
 	<comment></comment>
 	<projects>
+		<project>metaporter-mcu</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
