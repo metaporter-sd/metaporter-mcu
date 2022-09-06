@@ -86,7 +86,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   GPIO_Init();
 
-  USART5_UART_Init();
+  USART3_UART_Init();
 
   transmitString("Hi\n\r");
   /* USER CODE END 2 */
