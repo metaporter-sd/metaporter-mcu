@@ -52,7 +52,7 @@ extern "C" {
 
 /* USER CODE BEGIN EFP */
 void GPIO_Init(void);
-void USART5_UART_Init(void);
+void USART3_UART_Init(void);
 void transmitChar(uint8_t);
 void transmitString(char *);
 /* USER CODE END EFP */

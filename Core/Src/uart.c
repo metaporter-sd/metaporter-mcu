@@ -61,40 +61,40 @@
 
 void GPIO_Init(void) {
 
-	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;			// Enable GPIOB
-	GPIOB->MODER &= ~GPIO_MODER_MODER3;			// Clear GPIOB MODER3 bits
-	GPIOB->MODER |= GPIO_MODER_MODER3_1;		// Set alternate function bits
-	GPIOB->MODER &= ~GPIO_MODER_MODER4;			// Clear GPIOB MODER4 bits
-	GPIOB->MODER |= GPIO_MODER_MODER4_1;		// Set alternate function bits
-	GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEEDR3;	// Set high speed output for GPIOB pin 3
-	GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEEDR4;	// Set high speed output for GPIOB pin 4
-	GPIOB->AFR[0]  |= (4<<12);					// Set AF4 for GPIOB pin 3
-	GPIOB->AFR[0]  |= (4<<16);					// Set AF4 for GPIOB pin 4
+	RCC->AHBENR |= RCC_AHBENR_GPIOCEN;			// Enable GPIOC
+	GPIOC->MODER &= ~GPIO_MODER_MODER10;		// Clear GPIOC MODER10 bits
+	GPIOC->MODER |= GPIO_MODER_MODER10_1;		// Set alternate function bits
+	GPIOC->MODER &= ~GPIO_MODER_MODER11;		// Clear GPIOC MODER11 bits
+	GPIOC->MODER |= GPIO_MODER_MODER11_1;		// Set alternate function bits
+	GPIOC->OSPEEDR |= GPIO_OSPEEDR_OSPEEDR10;	// Set high speed output for GPIOC pin 10
+	GPIOC->OSPEEDR |= GPIO_OSPEEDR_OSPEEDR11;	// Set high speed output for GPIOC pin 11
+	GPIOC->AFR[1]  |= (1<<8);					// Set AF1 for GPIOC pin 10
+	GPIOC->AFR[1]  |= (1<<12);					// Set AF1 for GPIOC pin 11
 
 }
 
-void USART5_UART_Init(void) {
+void USART3_UART_Init(void) {
 
-	RCC->APB1ENR |= RCC_APB1ENR_USART5EN;	// Enable USART5
-	USART5->CR1 &= ~USART_CR1_UE;			// Disable UE (USART5)
-	USART5->CR1 &= ~(0x3<<28);				// Set word length (M0) to 1 Start bit, 8 data bits, n stop bits
-	USART5->CR2 &= ~(0x3<<12);				// Set stop bit to 1
-	USART5->CR1 &= ~USART_CR1_PCE;			// Disable parity control
-	USART5->CR1 &= ~USART_CR1_OVER8;		// Set oversampling by 16
-	USART5->BRR = 0x1a1;					// Set baud rate to 115200 bits/s (0x1a1 = 417 = 48000000 / 115200)
-	USART5->CR1 |= 1<<2;					// Receiver is enabled
-	USART5->CR1 |= 1<<3;					// Transmitter is enabled
-	USART5->CR1 |= 1;						// Enable UE (USART5)
+	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;	// Enable USART3
+	USART3->CR1 &= ~USART_CR1_UE;			// Disable UE (USART3)
+	USART3->CR1 &= ~(0x3<<28);				// Set word length (M0) to 1 Start bit, 8 data bits, n stop bits
+	USART3->CR2 &= ~(0x3<<12);				// Set stop bit to 1
+	USART3->CR1 &= ~USART_CR1_PCE;			// Disable parity control
+	USART3->CR1 &= ~USART_CR1_OVER8;		// Set oversampling by 16
+	USART3->BRR = 0x1a1;					// Set baud rate to 115200 bits/s (0x1a1 = 417 = 48000000 / 115200)
+	USART3->CR1 |= 1<<2;					// Receiver is enabled
+	USART3->CR1 |= 1<<3;					// Transmitter is enabled
+	USART3->CR1 |= 1;						// Enable UE (USART3)
 
-	while(((USART5->ISR & USART_ISR_REACK) != USART_ISR_REACK) && ((USART5->ISR & USART_ISR_TEACK) != USART_ISR_TEACK));
+	while(((USART3->ISR & USART_ISR_REACK) != USART_ISR_REACK) && ((USART3->ISR & USART_ISR_TEACK) != USART_ISR_TEACK));
 
 }
 
 void transmitChar(uint8_t c) {
 
-	while((USART5->ISR & USART_ISR_TXE) != USART_ISR_TXE);
-	USART5->TDR = c;
-	while((USART5->ISR & USART_ISR_TXE) != USART_ISR_TXE);
+	while((USART3->ISR & USART_ISR_TXE) != USART_ISR_TXE);
+	USART3->TDR = c;
+	while((USART3->ISR & USART_ISR_TXE) != USART_ISR_TXE);
 
 }
 
