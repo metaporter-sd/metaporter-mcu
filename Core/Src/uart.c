@@ -90,6 +90,28 @@ void USART3_UART_Init(void) {
 
 }
 
+void USART3_DMA1_Init(const short * data) {
+
+    RCC->AHBENR |= RCC_AHBENR_DMA1EN;
+    DMA1_Channel7->CCR &= ~DMA_CCR_EN;					// Make sure DMA is off
+    DMA1_Channel7->CPAR = (uint32_t)(&(USART3->TDR));	// Copy to address in CPAR (USART3 TX)
+    DMA1_Channel7->CMAR = (uint32_t)(data);				// Copy from address in CMAR
+    DMA1_Channel7->CNDTR = 34;							// Copy this many data
+    DMA1_Channel7->CCR |= DMA_CCR_DIR;					// Read from "memory"
+    DMA1_Channel7->CCR |= DMA_CCR_MINC;					// Increment CMAR as we copy
+    DMA1_Channel7->CCR &= ~(DMA_CCR_PSIZE);				// 00: 8 bits
+    DMA1_Channel7->CCR &= ~(DMA_CCR_MSIZE);				// 00: 8 bits
+    //DMA1_Channel7->CCR |= DMA_CCR_CIRC;					// Enable circular buffer
+    NVIC->ISER[0] = 1<<DMA1_Channel7_IRQn;				// Enable the interrupt
+
+}
+
+void enable_dma(void) {
+
+    DMA1_Channel7->CCR |= 1;	// Enable DMA
+
+}
+
 void transmitChar(uint8_t c) {
 
 	while((USART3->ISR & USART_ISR_TXE) != USART_ISR_TXE);
