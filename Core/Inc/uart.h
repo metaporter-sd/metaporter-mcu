@@ -51,10 +51,10 @@ extern "C" {
 /* Exported functions prototypes ---------------------------------------------*/
 
 /* USER CODE BEGIN EFP */
-void GPIO_Init(void);
 void USART3_UART_Init(void);
 void transmitChar(uint8_t);
 void transmitString(char *);
+void USART3_UART_Test(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

@@ -84,15 +84,14 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
-  GPIO_Init();
 
   USART3_UART_Init();
 
-  transmitString("Hi\n\r");
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  USART3_UART_Test();
 
   while (1)
   {

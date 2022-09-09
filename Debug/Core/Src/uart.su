@@ -1,4 +1,5 @@
-../Core/Src/uart.c:62:6:GPIO_Init	8	static
-../Core/Src/uart.c:76:6:USART5_UART_Init	8	static
-../Core/Src/uart.c:93:6:transmitChar	16	static
-../Core/Src/uart.c:101:6:transmitString	16	static
+../Core/Src/uart.c:62:13:GPIO_Init	8	static
+../Core/Src/uart.c:76:6:USART3_UART_Init	8	static
+../Core/Src/uart.c:95:6:transmitChar	16	static
+../Core/Src/uart.c:103:6:transmitString	16	static
+../Core/Src/uart.c:111:6:USART3_UART_Test	8	static
