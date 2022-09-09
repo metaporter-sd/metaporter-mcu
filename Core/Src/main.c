@@ -17,8 +17,13 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <stdio.h>
+#include <time.h>
+#include <assert.h>
+
 #include "main.h"
 #include "uart.h"
+#include "keypad.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -66,6 +71,7 @@ int main(void)
 
   /* USER CODE END 1 */
 
+
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -84,11 +90,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
-  GPIO_Init();
+  Keypad_Init();
 
-  USART3_UART_Init();
 
-  transmitString("Hi\n\r");
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -97,7 +101,11 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	char buttonVal;
+	if(Keypad_Scan(&buttonVal))
+	{
+		fprintf("%c",buttonVal);
+	}
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
