@@ -59,7 +59,7 @@
 
 /* USER CODE BEGIN 4 */
 
-void GPIO_Init(void) {
+static void GPIO_Init(void) {
 
 	RCC->AHBENR |= RCC_AHBENR_GPIOCEN;			// Enable GPIOC
 	GPIOC->MODER &= ~GPIO_MODER_MODER10;		// Clear GPIOC MODER10 bits
@@ -74,6 +74,8 @@ void GPIO_Init(void) {
 }
 
 void USART3_UART_Init(void) {
+
+	GPIO_Init();
 
 	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;	// Enable USART3
 	USART3->CR1 &= ~USART_CR1_UE;			// Disable UE (USART3)
@@ -103,6 +105,12 @@ void transmitString(char * str) {
 	while(*str) {
 		transmitChar(*str++);
 	}
+
+}
+
+void USART3_UART_Test(void) {
+
+	transmitString("hi\n\r");
 
 }
 
