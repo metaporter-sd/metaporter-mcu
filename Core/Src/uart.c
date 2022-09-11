@@ -74,7 +74,7 @@ void uart3_gpio_init(void) {
 }
 
 void uart3_init(void) {
-	uart3_gpio_init
+	uart3_gpio_init();
 	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;	// Enable USART3
 	USART3->CR1 &= ~USART_CR1_UE;			// Disable UE (USART3)
 	USART3->CR1 &= ~(0x3<<28);				// Set word length (M0) to 1 Start bit, 8 data bits, n stop bits
@@ -90,17 +90,13 @@ void uart3_init(void) {
 
 }
 
-uart3_creater_header(void* pheader, uint8_t command, uint8_t d_source, uint8_t d_type, uint8_t num_data)
+void uart3_create_header(uint8_t* pheader, uint8_t command, uint8_t d_source, uint8_t d_type, uint8_t num_data)
 {
-	uint8_t header = (uint8_t*) pdata;
-	header[1] = 0;
-	header[1] |= d_source;
-	header[1] |= d_type;
-	if (command == UART_COM_NONE) {
-		header [2] = num_data
-	} else {
-		header[1] |= command;
-	}
+	pheader[0] = 0;
+	pheader[0] |= command;
+	pheader[0] |= d_source;
+	pheader[0] |= d_type;
+	pheader[1] = num_data;
 }
 
 void uart3_send_byte(uint8_t c) {

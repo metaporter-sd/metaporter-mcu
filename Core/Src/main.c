@@ -84,15 +84,15 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
+  uart3_init();
 
-  USART3_UART_Init();
+  uint8_t header[2];
+  uart3_create_header(header, UART_COM_NONE, UART_DATA_SOURCE_LIDAR, UART_UINT16_T, 20);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  USART3_UART_Test();
-
   while (1)
   {
     /* USER CODE END WHILE */
