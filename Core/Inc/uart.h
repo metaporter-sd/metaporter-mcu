@@ -50,8 +50,8 @@ extern "C" {
 #define UART_DATA_SOURCE_IMU 0b10 << UART_DATA_SOURCE_SHIFT
 
 #define UART_DATA_TYPE_SHIFT 4
-#define UART_UINT8_T 0b0001
-#define UART_UINT16_T 0b0010
+#define UART_UINT8_T 0b0001 << UART_DATA_TYPE_SHIFT
+#define UART_UINT16_T 0b0010 << UART_DATA_TYPE_SHIFT
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -62,7 +62,7 @@ extern "C" {
 /* Exported functions prototypes ---------------------------------------------*/
 
 /* USER CODE BEGIN EFP */
-uart3_creater_header(void* pheader, uint8_t command, uint8_t d_source, uint8_t d_type, uint8_t num_data);
+void uart3_create_header(uint8_t* pheader, uint8_t command, uint8_t d_source, uint8_t d_type, uint8_t num_data);
 void uart3_init(void);
 void uart3_send_byte(uint8_t);
 void uart3_send_string(char *);
