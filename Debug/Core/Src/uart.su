@@ -1,13 +1,6 @@
-<<<<<<< HEAD
-../Core/Src/uart.c:62:13:GPIO_Init	8	static
-../Core/Src/uart.c:76:6:USART3_UART_Init	8	static
-../Core/Src/uart.c:95:6:transmitChar	16	static
-../Core/Src/uart.c:103:6:transmitString	16	static
-../Core/Src/uart.c:111:6:USART3_UART_Test	8	static
-=======
 ../Core/Src/uart.c:62:6:uart3_gpio_init	8	static
 ../Core/Src/uart.c:76:6:uart3_init	8	static
 ../Core/Src/uart.c:93:6:uart3_create_header	24	static
 ../Core/Src/uart.c:102:6:uart3_send_byte	16	static
 ../Core/Src/uart.c:110:6:uart3_send_string	16	static
->>>>>>> eecb9fb (uart header bug fixes)
+../Core/Src/uart.c:118:6:uart3_test	8	static

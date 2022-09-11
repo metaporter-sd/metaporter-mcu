@@ -115,9 +115,9 @@ void uart3_send_string(char * str) {
 
 }
 
-void USART3_UART_Test(void) {
+void uart3_test(void) {
 
-	transmitString("hi\n\r");
+	uart3_send_string("This is a UART test\n\r");
 
 }
 

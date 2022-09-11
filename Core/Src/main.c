@@ -88,6 +88,7 @@ int main(void)
 
   uint8_t header[2];
   uart3_create_header(header, UART_COM_NONE, UART_DATA_SOURCE_LIDAR, UART_UINT16_T, 20);
+  uart3_test();
 
   /* USER CODE END 2 */
 
