@@ -59,7 +59,7 @@
 
 /* USER CODE BEGIN 4 */
 
-void GPIO_Init(void) {
+void uart3_gpio_init(void) {
 
 	RCC->AHBENR |= RCC_AHBENR_GPIOCEN;			// Enable GPIOC
 	GPIOC->MODER &= ~GPIO_MODER_MODER10;		// Clear GPIOC MODER10 bits
@@ -73,8 +73,8 @@ void GPIO_Init(void) {
 
 }
 
-void USART3_UART_Init(void) {
-
+void uart3_init(void) {
+	uart3_gpio_init();
 	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;	// Enable USART3
 	USART3->CR1 &= ~USART_CR1_UE;			// Disable UE (USART3)
 	USART3->CR1 &= ~(0x3<<28);				// Set word length (M0) to 1 Start bit, 8 data bits, n stop bits
@@ -90,7 +90,16 @@ void USART3_UART_Init(void) {
 
 }
 
-void transmitChar(uint8_t c) {
+void uart3_create_header(uint8_t* pheader, uint8_t command, uint8_t d_source, uint8_t d_type, uint8_t num_data)
+{
+	pheader[0] = 0;
+	pheader[0] |= command;
+	pheader[0] |= d_source;
+	pheader[0] |= d_type;
+	pheader[1] = num_data;
+}
+
+void uart3_send_byte(uint8_t c) {
 
 	while((USART3->ISR & USART_ISR_TXE) != USART_ISR_TXE);
 	USART3->TDR = c;
@@ -98,11 +107,17 @@ void transmitChar(uint8_t c) {
 
 }
 
-void transmitString(char * str) {
+void uart3_send_string(char * str) {
 
 	while(*str) {
-		transmitChar(*str++);
+		uart3_send_byte(*str++);
 	}
+
+}
+
+void uart3_test(void) {
+
+	uart3_send_string("This is a UART test\n\r");
 
 }
 

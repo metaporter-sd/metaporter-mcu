@@ -41,6 +41,17 @@ extern "C" {
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
 
+#define UART_COM_NONE 0b00
+#define UART_COM_START_DATA_COLLECTION 0b01
+#define UART_COM_STOP_DATA_COLLECTION 0b11
+
+#define UART_DATA_SOURCE_SHIFT 2
+#define UART_DATA_SOURCE_LIDAR 0b01 << UART_DATA_SOURCE_SHIFT
+#define UART_DATA_SOURCE_IMU 0b10 << UART_DATA_SOURCE_SHIFT
+
+#define UART_DATA_TYPE_SHIFT 4
+#define UART_UINT8_T 0b0001 << UART_DATA_TYPE_SHIFT
+#define UART_UINT16_T 0b0010 << UART_DATA_TYPE_SHIFT
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -51,15 +62,17 @@ extern "C" {
 /* Exported functions prototypes ---------------------------------------------*/
 
 /* USER CODE BEGIN EFP */
-void GPIO_Init(void);
-void USART3_UART_Init(void);
-void transmitChar(uint8_t);
-void transmitString(char *);
+void uart3_init(void);
+void uart3_create_header(uint8_t* pheader, uint8_t command, uint8_t d_source, uint8_t d_type, uint8_t num_data);
+void uart3_send_byte(uint8_t);
+void uart3_send_string(char *);
+
+void uart3_test(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
-
+void uart3_gpio_init(void);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

@@ -34,34 +34,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := metaporter-mcu
+BUILD_ARTIFACT_NAME := metaporter
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-metaporter-mcu.elf \
+metaporter.elf \
 
 MAP_FILES += \
-metaporter-mcu.map \
+metaporter.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-metaporter-mcu.list \
+metaporter.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: metaporter-mcu.elf secondary-outputs
+main-build: metaporter.elf secondary-outputs
 
 # Tool invocations
-metaporter-mcu.elf metaporter-mcu.map: $(OBJS) $(USER_OBJS) C:\Users\12197\STM32CubeIDE\workspace_1.10.1\metaporter-mcu\STM32F091RCTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "metaporter-mcu.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"C:\Users\12197\STM32CubeIDE\workspace_1.10.1\metaporter-mcu\STM32F091RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="metaporter-mcu.map" -Wl,--gc-sections -static -L"C:\Users\12197\STM32CubeIDE\workspace_1.10.1\metaporter-mcu\Core\Src" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+metaporter.elf metaporter.map: $(OBJS) $(USER_OBJS) /home/jehan/Documents/coursework/snr-design/metaporter-mcu/STM32F091RCTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "metaporter.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"/home/jehan/Documents/coursework/snr-design/metaporter-mcu/STM32F091RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="metaporter.map" -Wl,--gc-sections -static -L"C:\Users\12197\STM32CubeIDE\workspace_1.10.1\metaporter-mcu\Core\Src" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -70,14 +70,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-metaporter-mcu.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "metaporter-mcu.list"
+metaporter.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "metaporter.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) default.size.stdout metaporter-mcu.elf metaporter-mcu.list metaporter-mcu.map
+	-$(RM) default.size.stdout metaporter.elf metaporter.list metaporter.map
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
