@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "uart.h"
+#include "lidar.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -72,7 +73,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -85,10 +86,22 @@ int main(void)
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
   uart3_init();
+  lidar_init();
 
   uint8_t header[2];
   uart3_create_header(header, UART_COM_NONE, UART_DATA_SOURCE_LIDAR, UART_UINT16_T, 20);
   uart3_test();
+
+  //lidar_test_start_stop(); // passes. scope verified
+  //lidar_test_send_one(); // passes. scope verified
+  //lidar_test_send(); // passes. scope verified
+  //lidar_test_read_one();  // passes. scope verified
+  //lidar_wait_for_data(); // passes. scope verified
+  // lidar_test_get_one_distance(); // passes. scope verified. Reading takes a long time to be ready
+
+  // read lidar data into buffer
+  uint16_t dist[100] = {0};
+  lidar_get_distance(dist, sizeof(dist) / sizeof(dist[0]));
 
   /* USER CODE END 2 */
 
