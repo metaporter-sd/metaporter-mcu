@@ -58,7 +58,7 @@ uint8_t lidar_addr = 0x62; // default 7 bit address
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void I2C1_init()
+void i2c1_init()
 {
 	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
 	GPIOB->MODER &= ~(GPIO_MODER_MODER6 | GPIO_MODER_MODER7);
@@ -85,7 +85,7 @@ void I2C1_init()
     I2C1->CR1 |= I2C_CR1_PE;
 }
 
-void I2C1_start(uint32_t devaddr, uint8_t size, uint8_t dir)
+void i2c1_start(uint32_t devaddr, uint8_t size, uint8_t dir)
 {
 	uint32_t tempreg = I2C1->CR2;
 	tempreg &= ~(I2C_CR2_SADD | I2C_CR2_NBYTES | I2C_CR2_RELOAD |
@@ -103,7 +103,7 @@ void I2C1_start(uint32_t devaddr, uint8_t size, uint8_t dir)
     I2C1->CR2 = tempreg;
 }
 
-void I2C1_stop(void)
+void i2c1_stop(void)
 {
     if (I2C1->ISR & I2C_ISR_STOPF)
     {
@@ -115,12 +115,12 @@ void I2C1_stop(void)
     I2C1->ICR |= I2C_ICR_STOPCF; // Clear stop flag
 }
 
-void I2C1_wait_idle(void)
+void i2c1_wait_idle(void)
 {
     while ((I2C1->ISR & I2C_ISR_BUSY) == I2C_ISR_BUSY); // Wait while busy
 }
 
-int8_t I2C1_send_data(uint8_t devaddr, void *pdata, uint8_t size)
+int8_t i2c1_send_data(uint8_t devaddr, void *pdata, uint8_t size)
 {
     int i;
     if (size <= 0 || pdata == 0)
@@ -128,9 +128,9 @@ int8_t I2C1_send_data(uint8_t devaddr, void *pdata, uint8_t size)
         return -1;
     }
     uint8_t *udata = (uint8_t*)pdata;
-    I2C1_wait_idle();
+    i2c1_wait_idle();
 
-    I2C1_start(devaddr, size, 0);
+    i2c1_start(devaddr, size, 0);
 
     for (i = 0; i < size; i++)
     {
@@ -146,7 +146,7 @@ int8_t I2C1_send_data(uint8_t devaddr, void *pdata, uint8_t size)
             if ((I2C1->ISR & I2C_ISR_NACKF))
             {
                 I2C1->ICR |= I2C_ICR_NACKCF;
-                I2C1_stop();
+                i2c1_stop();
                 return -1;
             }
         }
@@ -162,11 +162,11 @@ int8_t I2C1_send_data(uint8_t devaddr, void *pdata, uint8_t size)
         return -1;
     }
 
-    I2C1_stop();
+    i2c1_stop();
     return 0;
 }
 
-int8_t I2C1_recv_data(uint8_t devaddr, void *pdata, uint8_t size)
+int8_t i2c1_recv_data(uint8_t devaddr, void *pdata, uint8_t size)
 {
     int i;
     if (size <= 0 || pdata == 0)
@@ -174,9 +174,9 @@ int8_t I2C1_recv_data(uint8_t devaddr, void *pdata, uint8_t size)
         return -1;
     }
     uint8_t *udata = (uint8_t*) pdata;
-    I2C1_wait_idle();
+    i2c1_wait_idle();
 
-    I2C1_start(devaddr, size, 1);
+    i2c1_start(devaddr, size, 1);
 
     for (i = 0; i < size; i++)
     {
@@ -186,26 +186,26 @@ int8_t I2C1_recv_data(uint8_t devaddr, void *pdata, uint8_t size)
     }
 
     while ((I2C1->ISR & I2C_ISR_TC) == 0);
-    I2C1_stop();
+    i2c1_stop();
     return 0;
 }
 
 void lidar_init()
 {
-	I2C1_init();
+	i2c1_init();
 }
 
 void lidar_init_dist_measure()
 {
 	uint8_t init_data[] = {LIDAR_ACQ_COMMAND_REG, LIDAR_ACQ_COMMAND_VAL};
-	I2C1_send_data(lidar_addr, init_data, sizeof(init_data));
+	i2c1_send_data(lidar_addr, init_data, sizeof(init_data));
 }
 
 void lidar_wait_for_data()
 {
 
 	uint8_t reg_addr[] = {LIDAR_STATUS_REG};
-	I2C1_send_data(lidar_addr, reg_addr, sizeof(reg_addr));
+	i2c1_send_data(lidar_addr, reg_addr, sizeof(reg_addr));
 
 	uint16_t counter = 0;
 	uint8_t busy[] = {1};
@@ -216,40 +216,43 @@ void lidar_wait_for_data()
 			break;
 		}
 
-		I2C1_recv_data(lidar_addr, busy, sizeof(busy));
+		i2c1_recv_data(lidar_addr, busy, sizeof(busy));
 		busy[0] &= 0x01;
 		counter++;
 		nano_wait(10000);
 	}
 }
 
-void lidar_get_distance(uint16_t* pdist, uint8_t len)
+void lidar_read_dist_reg(uint16_t* pdist)
 {
-	int i;
-	for (i = 0; i < len; i++)
-	{
-		// step 1: initiate the transaction and set the register from which we want to read
-		lidar_init_dist_measure();
+	uint8_t reg_addr[] = {LIDAR_DIST_ADDR};
+	i2c1_send_data(lidar_addr, reg_addr, sizeof(reg_addr));
 
-		// step 2: wait till status reg lsb goes low
-		lidar_wait_for_data();
+	uint8_t temp[2] = {0};
+	i2c1_recv_data(lidar_addr, temp, sizeof(temp));
 
-		uint8_t reg_addr[] = {LIDAR_DIST_ADDR};
-		I2C1_send_data(lidar_addr, reg_addr, sizeof(reg_addr));
+	*pdist = ((temp[0] << 8) | temp[1]);
+}
 
-		uint8_t temp[2] = {0};
-		I2C1_recv_data(lidar_addr, temp, sizeof(temp));
+void lidar_get_distance(uint16_t* pdist)
+{
 
-		pdist[i] = ((temp[0] << 8) | temp[1]);
-	}
+	// step 1: initiate the transaction and set the register from which we want to read
+	lidar_init_dist_measure();
+
+	// step 2: wait till status reg lsb goes low
+	lidar_wait_for_data();
+
+	// step 3: read data register
+	lidar_read_dist_reg(pdist);
 }
 
 void lidar_test_start_stop()
 {
 	while(1)
 	{
-		I2C1_wait_idle();
-		I2C1_start(lidar_addr, 0, 0);
+		i2c1_wait_idle();
+		i2c1_start(lidar_addr, 0, 0);
 		int x = 0;
 		while ((I2C1->ISR & I2C_ISR_TC) == 0 &&
 				(I2C1->ISR & I2C_ISR_STOPF) == 0 &&
@@ -260,7 +263,7 @@ void lidar_test_start_stop()
 		if (I2C1->ISR & I2C_ISR_STOPF)
 			I2C1->ICR |= I2C_ICR_STOPCF;
 		else
-			I2C1_stop();
+			i2c1_stop();
 		nano_wait(1000000);
 	}
 
@@ -270,7 +273,7 @@ void lidar_test_send_one() // test sending data once
 {
 	uint8_t init_data[1];
 	init_data[0] = LIDAR_ACQ_COMMAND_REG;
-	I2C1_send_data(lidar_addr, init_data, sizeof(init_data));
+	i2c1_send_data(lidar_addr, init_data, sizeof(init_data));
 }
 
 void lidar_test_send_many() // test sending data once
@@ -282,16 +285,16 @@ void lidar_test_read_one()
 {
 	//lidar_init_dist_measure();
 	uint8_t reg_addr[] = {LIDAR_STATUS_REG};
-	I2C1_send_data(lidar_addr, reg_addr, sizeof(reg_addr));
+	i2c1_send_data(lidar_addr, reg_addr, sizeof(reg_addr));
 
 	uint8_t busy[] = {1};
-	I2C1_recv_data(lidar_addr, busy, sizeof(busy));
+	i2c1_recv_data(lidar_addr, busy, sizeof(busy));
 }
 
 void lidar_test_get_one_distance()
 {
-	uint16_t dist[1] = {0};
-	lidar_get_distance(dist, sizeof(dist) / sizeof(dist[0]));
+	uint16_t dist;
+	lidar_get_distance(&dist);
 }
 
 
