@@ -20,6 +20,7 @@
 #include "main.h"
 #include "uart.h"
 #include "lidar.h"
+#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -95,16 +96,34 @@ int main(void)
   //lidar_wait_for_data(); // passes. scope verified
   // lidar_test_get_one_distance(); // passes. scope verified. Reading takes a long time to be ready
 
-  // read lidar data into buffer
-  uint16_t dist[2];
-  for (int i = 0; i < 2; i++) {
-	  lidar_get_distance(&dist[i]);
-  }
-
-
-  uint8_t header[2];
-  uart3_create_header(header, UART_COM_NONE, UART_DATA_SOURCE_LIDAR, UART_UINT16_T, 20);
+#define LIDAR_BUFFER_SIZE 200
   uart3_test();
+
+  // UART buffer for lidar data
+  uint8_t header[2];
+  uart3_create_header(header, UART_COM_NONE, UART_DATA_SOURCE_LIDAR, UART_UINT16_T, LIDAR_BUFFER_SIZE);
+
+  char dist_string[8];
+
+  // send header as string
+  sprintf(dist_string, "%d", header[0]);
+  uart3_send_string(dist_string);
+  uart3_send_string("\n\r");
+
+  sprintf(dist_string, "%d", header[1]);
+  uart3_send_string(dist_string);
+  uart3_send_string("\n\r");
+
+  // read lidar data into buffer and send as string
+  uint16_t dist[LIDAR_BUFFER_SIZE];
+  for (int i = 0; i < LIDAR_BUFFER_SIZE; i++) {
+	  lidar_get_distance(&dist[i]);
+
+	  // send over uart as string
+	  sprintf(dist_string, "%d", dist[i]);
+	  uart3_send_string(dist_string);
+	  uart3_send_string("\n\r");
+  }
 
   /* USER CODE END 2 */
 
