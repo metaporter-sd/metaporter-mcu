@@ -66,28 +66,33 @@ extern "C" {
 
 /* USER CODE BEGIN EFP */
 void lidar_init();
-void lidar_get_distance(uint16_t* pdist, uint8_t len);
+
+void lidar_init_dist_measure(); // step 1 for distance measure
+void lidar_wait_for_data(); // step 2
+void lidar_read_dist_reg(uint16_t* pdist); // step 3
+
+void lidar_get_distance(uint16_t* pdist);
 void nano_wait(unsigned int n);
 
 void lidar_test_start_stop();
 void lidar_test_send_one(); // test sending one byte
 void lidar_test_send_many(); // test multi-byte sending data once
 void lidar_test_read_one(); // one read from one register including write setups
-void lidar_wait_for_data();
 void lidar_test_get_one_distance(); // gets one distance reading
+
+
+
 
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
-void I2C1_init(); // setup the I2C channel 1 subsystem
-void I2C1_start(uint32_t devaddr, uint8_t size, uint8_t dir); // initiates transfer with slave device with r/w intent
-void I2C1_stop(void); // sends the stop bit
-void I2C1_wait_idle(void); // waits until bus is idle
-int8_t I2C1_send_data(uint8_t devaddr, void *pdata, uint8_t size);
-int8_t I2C1_recv_data(uint8_t devaddr, void *pdata, uint8_t size);
-
-void lidar_init_dist_measure();
+void i2c1_init(); // setup the I2C channel 1 subsystem
+void i2c1_start(uint32_t devaddr, uint8_t size, uint8_t dir); // initiates transfer with slave device with r/w intent
+void i2c1_stop(void); // sends the stop bit
+void i2c1_wait_idle(void); // waits until bus is idle
+int8_t i2c1_send_data(uint8_t devaddr, void *pdata, uint8_t size);
+int8_t i2c1_recv_data(uint8_t devaddr, void *pdata, uint8_t size);
 //void lidar_wait_for_data();
 /* USER CODE END Private defines */
 

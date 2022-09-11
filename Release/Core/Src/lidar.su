@@ -1,0 +1,17 @@
+../Core/Src/lidar.c:61:6:i2c1_init	0	static
+../Core/Src/lidar.c:88:6:i2c1_start	12	static
+../Core/Src/lidar.c:106:6:i2c1_stop	0	static
+../Core/Src/lidar.c:118:6:i2c1_wait_idle	0	static
+../Core/Src/lidar.c:123:8:i2c1_send_data	24	static
+../Core/Src/lidar.c:169:8:i2c1_recv_data	16	static
+../Core/Src/lidar.c:193:6:lidar_init	8	static
+../Core/Src/lidar.c:198:6:lidar_init_dist_measure	16	static
+../Core/Src/lidar.c:226:6:lidar_read_dist_reg	24	static
+../Core/Src/lidar.c:272:6:lidar_test_send_one	16	static
+../Core/Src/lidar.c:279:6:lidar_test_send_many	8	static
+../Core/Src/lidar.c:284:6:lidar_test_read_one	24	static
+../Core/Src/lidar.c:301:6:nano_wait	0	static,ignoring_inline_asm
+../Core/Src/lidar.c:204:6:lidar_wait_for_data	24	static
+../Core/Src/lidar.c:237:6:lidar_get_distance	8	static
+../Core/Src/lidar.c:294:6:lidar_test_get_one_distance	16	static
+../Core/Src/lidar.c:250:6:lidar_test_start_stop	16	static
