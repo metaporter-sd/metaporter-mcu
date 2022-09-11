@@ -62,10 +62,12 @@ extern "C" {
 /* Exported functions prototypes ---------------------------------------------*/
 
 /* USER CODE BEGIN EFP */
-void uart3_create_header(uint8_t* pheader, uint8_t command, uint8_t d_source, uint8_t d_type, uint8_t num_data);
 void uart3_init(void);
+void uart3_create_header(uint8_t* pheader, uint8_t command, uint8_t d_source, uint8_t d_type, uint8_t num_data);
 void uart3_send_byte(uint8_t);
 void uart3_send_string(char *);
+
+void uart3_test(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
