@@ -60,8 +60,8 @@ all: main-build
 main-build: metaporter-mcu.elf secondary-outputs
 
 # Tool invocations
-metaporter-mcu.elf metaporter-mcu.map: $(OBJS) $(USER_OBJS) C:\Users\12197\STM32CubeIDE\workspace_1.10.1\metaporter-mcu\STM32F091RCTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "metaporter-mcu.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"C:\Users\12197\STM32CubeIDE\workspace_1.10.1\metaporter-mcu\STM32F091RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="metaporter-mcu.map" -Wl,--gc-sections -static -L"C:\Users\12197\STM32CubeIDE\workspace_1.10.1\metaporter-mcu\Core\Src" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+metaporter-mcu.elf metaporter-mcu.map: $(OBJS) $(USER_OBJS) /Users/manavbhasin/STM32CubeIDE/workspace_1.10.1/metaporter-mcu/STM32F091RCTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "metaporter-mcu.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"/Users/manavbhasin/STM32CubeIDE/workspace_1.10.1/metaporter-mcu/STM32F091RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="metaporter-mcu.map" -Wl,--gc-sections -static -L"C:\Users\12197\STM32CubeIDE\workspace_1.10.1\metaporter-mcu\Core\Src" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

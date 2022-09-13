@@ -19,7 +19,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "uart.h"
-
+#include "lcd.h"
+#include <string.h>
+//int time_remaining = 0;
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -60,7 +62,7 @@ void SystemClock_Config(void);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
+int not_main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -84,7 +86,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
-  GPIO_Init();
+  //GPIO_Init();
+  LCD_Setup();
+  init_tim6();
 
   USART5_UART_Init();
 
@@ -102,6 +106,10 @@ int main(void)
   }
   /* USER CODE END 3 */
 }
+
+
+
+
 
 /**
   * @brief System Clock Configuration
@@ -171,4 +179,6 @@ void assert_failed(uint8_t *file, uint32_t line)
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
+
+
 #endif /* USE_FULL_ASSERT */
