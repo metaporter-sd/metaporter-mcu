@@ -94,7 +94,7 @@ int main(void)
   //lidar_test_send(); // passes. scope verified
   //lidar_test_read_one();  // passes. scope verified
   //lidar_wait_for_data(); // passes. scope verified
-  // lidar_test_get_one_distance(); // passes. scope verified. Reading takes a long time to be ready
+  //lidar_test_get_one_distance(); // passes. scope verified. Reading takes a long time to be ready
 
 #define LIDAR_BUFFER_SIZE 200
   uart3_test();
