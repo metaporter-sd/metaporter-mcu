@@ -1,4 +1,10 @@
-../Core/Src/uart.c:62:6:GPIO_Init	8	static
-../Core/Src/uart.c:76:6:USART5_UART_Init	8	static
-../Core/Src/uart.c:93:6:transmitChar	16	static
-../Core/Src/uart.c:101:6:transmitString	16	static
+../Core/Src/uart.c:63:6:GPIO_Init	8	static
+../Core/Src/uart.c:77:6:USART3_UART_Init	8	static
+../Core/Src/uart.c:95:6:USART3_DMA1_Init	16	static
+../Core/Src/uart.c:112:6:enable_dma	8	static
+../Core/Src/uart.c:118:6:transmitChar	16	static
+../Core/Src/uart.c:126:6:transmitString	16	static
+../Core/Src/uart.c:134:6:init_tim7	8	static
+../Core/Src/uart.c:145:6:TIM7_IRQHandler	8	static
+../Core/Src/uart.c:151:6:DMA1_Ch4_7_DMA2_Ch3_5_IRQHandler	8	static
+../Core/Src/uart.c:155:6:USART3_UART_Test	8	static

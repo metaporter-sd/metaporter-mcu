@@ -40,7 +40,7 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
+#define BUFFER_LENGTH 100
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -53,10 +53,12 @@ extern "C" {
 /* USER CODE BEGIN EFP */
 void GPIO_Init(void);
 void USART3_UART_Init(void);
-void USART3_DMA1_Init(const short *);
+void USART3_DMA1_Init(void);
+void init_tim7(void);
 void enable_dma(void);
 void transmitChar(uint8_t);
 void transmitString(char *);
+void USART3_UART_Test(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

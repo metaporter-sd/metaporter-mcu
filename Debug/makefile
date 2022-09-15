@@ -60,7 +60,7 @@ all: main-build
 main-build: metaporter-mcu.elf secondary-outputs
 
 dependents:
-	-cd C:/Users/12197/STM32CubeIDE/workspace_1.10.1/metaporter-mcu/Release && $(MAKE) all
+	-cd C:/Users/12197/STM32CubeIDE/workspace_1.10.1/metaporter-mcu/Release && $(MAKE) clean all
 
 # Tool invocations
 metaporter-mcu.elf metaporter-mcu.map: $(OBJS) $(USER_OBJS) C:/Users/12197/STM32CubeIDE/workspace_1.10.1/metaporter-mcu/Release/metaporter-mcu.elf C:\Users\12197\STM32CubeIDE\workspace_1.10.1\metaporter-mcu\STM32F091RCTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)

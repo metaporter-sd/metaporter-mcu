@@ -40,7 +40,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+char DMA_Buffer[2][BUFFER_LENGTH];
+char * test = "12345678901234567890123456789012345678901234567890\n\r";
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -82,6 +83,7 @@ void USART3_UART_Init(void) {
 	USART3->CR1 &= ~USART_CR1_PCE;			// Disable parity control
 	USART3->CR1 &= ~USART_CR1_OVER8;		// Set oversampling by 16
 	USART3->BRR = 0x1a1;					// Set baud rate to 115200 bits/s (0x1a1 = 417 = 48000000 / 115200)
+	USART3->CR3 |= USART_CR3_DMAT;          // Enable USART3 transmitter DMA
 	USART3->CR1 |= 1<<2;					// Receiver is enabled
 	USART3->CR1 |= 1<<3;					// Transmitter is enabled
 	USART3->CR1 |= 1;						// Enable UE (USART3)
@@ -90,19 +92,20 @@ void USART3_UART_Init(void) {
 
 }
 
-void USART3_DMA1_Init(const short * data) {
+void USART3_DMA1_Init() {
 
     RCC->AHBENR |= RCC_AHBENR_DMA1EN;
     DMA1_Channel7->CCR &= ~DMA_CCR_EN;					// Make sure DMA is off
     DMA1_Channel7->CPAR = (uint32_t)(&(USART3->TDR));	// Copy to address in CPAR (USART3 TX)
-    DMA1_Channel7->CMAR = (uint32_t)(data);				// Copy from address in CMAR
-    DMA1_Channel7->CNDTR = 34;							// Copy this many data
+    DMA1_Channel7->CMAR = (uint32_t)(test);				// Copy from address in CMAR
+    DMA1_Channel7->CNDTR = strlen(test);				// Copy this many data
     DMA1_Channel7->CCR |= DMA_CCR_DIR;					// Read from "memory"
     DMA1_Channel7->CCR |= DMA_CCR_MINC;					// Increment CMAR as we copy
     DMA1_Channel7->CCR &= ~(DMA_CCR_PSIZE);				// 00: 8 bits
     DMA1_Channel7->CCR &= ~(DMA_CCR_MSIZE);				// 00: 8 bits
-    //DMA1_Channel7->CCR |= DMA_CCR_CIRC;					// Enable circular buffer
-    NVIC->ISER[0] = 1<<DMA1_Channel7_IRQn;				// Enable the interrupt
+    DMA1_Channel7->CCR |= DMA_CCR_CIRC;					// Enable circular buffer
+    DMA1_Channel7->CCR |= DMA_CCR_TCIE;					// Enable transfer complete interrupt
+    NVIC->ISER[0] = 1<<DMA1_Channel4_5_6_7_IRQn;		// Enable the interrupt
 
 }
 
@@ -126,6 +129,32 @@ void transmitString(char * str) {
 		transmitChar(*str++);
 	}
 
+}
+
+void init_tim7(void) {
+    TIM7->CR1 &= ~TIM_CR1_CEN;
+
+    RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;
+    TIM7->PSC = 48000-1;
+    TIM7->ARR = 200-1;
+    TIM7->DIER |= TIM_DIER_UIE;
+    NVIC->ISER[0] = 1<<TIM7_IRQn;
+    TIM7->CR1 |= TIM_CR1_CEN;
+}
+
+void TIM7_IRQHandler(void) {
+	DMA1->IFCR |= DMA_IFCR_CGIF7;
+	transmitString("Hi\n\r");
+	TIM7->SR &= ~TIM_SR_UIF;
+}
+
+void DMA1_Ch4_7_DMA2_Ch3_5_IRQHandler() {
+	while(DMA1->ISR && DMA_ISR_TCIF7);
+}
+
+void USART3_UART_Test() {
+	transmitString("Hi\n\r");
+	enable_dma();
 }
 
 /* USER CODE END 4 */

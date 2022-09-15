@@ -87,8 +87,10 @@ int main(void)
   GPIO_Init();
 
   USART3_UART_Init();
+  USART3_DMA1_Init();
+  init_tim7();
 
-  transmitString("Hi\n\r");
+  USART3_UART_Test();
   /* USER CODE END 2 */
 
   /* Infinite loop */
