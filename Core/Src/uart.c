@@ -40,7 +40,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-char DMA_Buffer[2][BUFFER_LENGTH];
+// char DMA_Buffer[2][BUFFER_LENGTH];
 char * test = "12345678901234567890123456789012345678901234567890\n\r";
 /* USER CODE END PV */
 
@@ -103,7 +103,7 @@ void USART3_DMA1_Init() {
     DMA1_Channel7->CCR |= DMA_CCR_MINC;					// Increment CMAR as we copy
     DMA1_Channel7->CCR &= ~(DMA_CCR_PSIZE);				// 00: 8 bits
     DMA1_Channel7->CCR &= ~(DMA_CCR_MSIZE);				// 00: 8 bits
-    DMA1_Channel7->CCR |= DMA_CCR_CIRC;					// Enable circular buffer
+//    DMA1_Channel7->CCR |= DMA_CCR_CIRC;					// Enable circular buffer
     DMA1_Channel7->CCR |= DMA_CCR_TCIE;					// Enable transfer complete interrupt
     NVIC->ISER[0] = 1<<DMA1_Channel4_5_6_7_IRQn;		// Enable the interrupt
 
@@ -153,7 +153,7 @@ void DMA1_Ch4_7_DMA2_Ch3_5_IRQHandler() {
 }
 
 void USART3_UART_Test() {
-	transmitString("Hi\n\r");
+	// transmitString("Hi\n\r");
 	enable_dma();
 }
 
