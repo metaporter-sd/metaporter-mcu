@@ -20,6 +20,7 @@
 #include "main.h"
 #include "uart.h"
 #include "lidar.h"
+#include "lcd.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -87,6 +88,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   uart3_init();
   lidar_init();
+  LCD_Setup();
 
   //lidar_test_start_stop(); // passes. scope verified
   //lidar_test_send_one(); // passes. scope verified
