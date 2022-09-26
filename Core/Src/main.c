@@ -21,6 +21,7 @@
 #include "uart.h"
 #include "lidar.h"
 #include "lcd.h"
+#include "keypad.h"
 #include <stdio.h>
 
 
@@ -46,7 +47,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+int time_remaining = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -89,8 +90,16 @@ int main(void)
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
   uart3_init();
-  lidar_init();
+  //lidar_init();
   LCD_Setup();
+  //Keypad_Init();
+
+  //uart3_test();
+
+  init_spi2();
+  spi2_init_oled();
+  LCD_DrawString(80, 125, BLACK, WHITE,  ("Metaporter"), 16, 0);
+  LCD_DrawString(80, 145, BLACK, WHITE,  ("Time: 0s"), 16, 0);
 
   //lidar_test_start_stop(); // passes. scope verified
   //lidar_test_send_one(); // passes. scope verified
@@ -98,7 +107,7 @@ int main(void)
   //lidar_test_read_one();  // passes. scope verified
   //lidar_wait_for_data(); // passes. scope verified
   //lidar_test_get_one_distance(); // passes. scope verified. Reading takes a long time to be ready
-
+  /*
 #define LIDAR_BUFFER_SIZE 200
   uart3_test();
 
@@ -127,7 +136,7 @@ int main(void)
 	  uart3_send_string(dist_string);
 	  uart3_send_string("\n\r");
   }
-
+  */
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -135,7 +144,10 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	char buttonVal;
+	if( Keypad_Scan(&buttonVal) ) {
+		uart3_send_byte(buttonVal);
+	}
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -176,6 +188,26 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void EXTI4_15_IRQHandler(void) {
+	char buttonVal;
+	if( Keypad_Scan(&buttonVal) ) {
+		uart3_send_byte(buttonVal);
+	}
+
+	EXTI->PR |= EXTI_PR_PR4 | EXTI_PR_PR5 | EXTI_PR_PR6 | EXTI_PR_PR7;
+}
+
+void TIM6_DAC_IRQHandler(void) {
+	char stringy[20];
+    TIM6->SR &= ~TIM_SR_UIF;
+    time_remaining+=1;
+    sprintf(stringy, "Time: %ds", time_remaining);
+    //sprintf(score_string, "Level: %d", level_score);
+    LCD_DrawString(80, 145, BLACK, WHITE,  (stringy), 16, 0);
+
+    spi2_display2(stringy);
+}
 
 /* USER CODE END 4 */
 

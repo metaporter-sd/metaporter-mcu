@@ -84,6 +84,11 @@ void LCD_DrawFillTriangle(u16 x0,u16 y0, u16 x1,u16 y1, u16 x2,u16 y2, u16 c);
 void LCD_DrawChar(u16 x,u16 y,u16 fc, u16 bc, char num, u8 size, u8 mode);
 void LCD_DrawString(u16 x,u16 y, u16 fc, u16 bg, const char *p, u8 size, u8 mode);
 
+void init_spi2(void);
+void spi2_init_oled(void);
+void spi2_display1(const char *string);
+void spi2_display2(const char *string);
+
 //===========================================================================
 // C Picture data structure.
 //===========================================================================

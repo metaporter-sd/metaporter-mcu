@@ -376,7 +376,6 @@ void init_lcd_spi(void)
 void init_tim6(void) {
     TIM6->CR1 &= ~TIM_CR1_CEN;
 
-    time_remaining = 0;
     RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
     TIM6->PSC = 48000-1;
     TIM6->ARR = 1000-1;
@@ -385,16 +384,67 @@ void init_tim6(void) {
     TIM6->CR1 |= TIM_CR1_CEN;
 }
 
-void TIM6_DAC_IRQHandler(void) {
-	char stringy[20];
-    TIM6->SR &= ~TIM_SR_UIF;
-    time_remaining+=1;
-    sprintf(stringy, "Time: %ds", time_remaining);
-    //sprintf(score_string, "Level: %d", level_score);
-    LCD_DrawString(140, 275, BLACK, WHITE,  (stringy), 16, 0);
+//===========================================================================
+// Initialize the SPI2 peripheral.
+//===========================================================================
+void init_spi2(void)
+{
+    //enable ports 12,13,15 for alternate function
+    RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+
+    GPIOB -> MODER &= ~0xcf000000;
+    GPIOB -> MODER |= 0x8a000000;
+
+    GPIOB -> AFR[1] &= ~0xf0ff0000; //set pb15, 13, 12 to AF0
+    GPIOB -> AFR[1] |= -0x00000000;
 
 
-    spi2_display2(stringy);
+    RCC->APB1ENR |= (1 << 14); //enable spi2
+
+    SPI2 -> CR1 &= ~(1 << 6);
+    SPI2 -> CR1 &= ~0x38;
+    SPI2 -> CR1 |= 0x38; //set the baud rate as low
+    SPI2 -> CR1 |= (1 << 2); // Master Mode
+    SPI2 -> CR2 = SPI_CR2_DS_3 | SPI_CR2_DS_0 | SPI_CR2_SSOE | SPI_CR2_NSSP;
+    SPI2 -> CR1 |= (1 << 6); //enable periph
+
+
+}
+
+void spi2_cmd(unsigned int data) {
+    while(!(SPI2->SR & SPI_SR_TXE)) {}
+    SPI2->DR = data;
+}
+
+void spi2_data(unsigned int data) {
+    spi2_cmd(data | 0x200);
+}
+
+void spi2_init_oled() {
+    nano_wait(1000000);
+    spi2_cmd(0x38);
+    spi2_cmd(0x08);
+    spi2_cmd(0x01);
+    nano_wait(2000000);
+    spi2_cmd(0x06);
+    spi2_cmd(0x02);
+    spi2_cmd(0x0c);
+}
+
+void spi2_display1(const char *string) {
+    spi2_cmd(0x02);
+    while(*string != '\0') {
+        spi2_data(*string);
+        string++;
+    }
+}
+
+void spi2_display2(const char *string) {
+    spi2_cmd(0xc0);
+    while(*string != '\0') {
+        spi2_data(*string);
+        string++;
+    }
 }
 
 //===========================================================================
