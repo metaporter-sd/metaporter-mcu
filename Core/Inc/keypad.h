@@ -38,18 +38,20 @@ typedef struct
 
 // The keypad pinout
 static const GPIO_KeypadPinout kpPinout = {
+
 		.Rows = {
-		{GPIOA,GPIO_PIN_0},
-		{GPIOA,GPIO_PIN_1},
-		{GPIOA,GPIO_PIN_2},
-		{GPIOA,GPIO_PIN_3}
+		{GPIOA,GPIO_PIN_7},
+		{GPIOA,GPIO_PIN_6},
+		{GPIOA,GPIO_PIN_5},
+		{GPIOA,GPIO_PIN_4}
 		},
 
+
 		.Cols = {
-		{GPIOA,GPIO_PIN_4},
-		{GPIOA,GPIO_PIN_5},
-		{GPIOA,GPIO_PIN_6},
-		{GPIOA,GPIO_PIN_7}
+		{GPIOA,GPIO_PIN_3},
+		{GPIOA,GPIO_PIN_2},
+		{GPIOA,GPIO_PIN_1},
+		{GPIOA,GPIO_PIN_0}
 		}
 };
 

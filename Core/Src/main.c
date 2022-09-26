@@ -92,7 +92,7 @@ int main(void)
   uart3_init();
   //lidar_init();
   LCD_Setup();
-  //Keypad_Init();
+  Keypad_Init();
 
   //uart3_test();
 
@@ -144,10 +144,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	char buttonVal;
-	if( Keypad_Scan(&buttonVal) ) {
-		uart3_send_byte(buttonVal);
-	}
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -188,14 +185,21 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-void EXTI4_15_IRQHandler(void) {
-	char buttonVal;
-	if( Keypad_Scan(&buttonVal) ) {
-		uart3_send_byte(buttonVal);
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if(GPIO_Pin == GPIO_PIN_8){
+		char buttonVal;
+		if(Keypad_Scan(&buttonVal))
+		{
+			uart3_send_byte(buttonVal);
+		}
 	}
+}
 
-	EXTI->PR |= EXTI_PR_PR4 | EXTI_PR_PR5 | EXTI_PR_PR6 | EXTI_PR_PR7;
+void EXTI4_15_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_Callback(GPIO_PIN_8);
+
 }
 
 void TIM6_DAC_IRQHandler(void) {

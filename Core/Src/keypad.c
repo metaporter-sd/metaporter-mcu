@@ -13,7 +13,10 @@ void Keypad_Init()
 	//Port setup
 	//enable GPIOA RCC
 	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-	//enable EXTI interrupts pin setup
+	/* Enable GPIOA clock (same as enabling ahb rcc)*/
+	//RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+	/* Enable SYSCFG clock */
+	//RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
 
 	// Setting up row for output high
@@ -23,7 +26,7 @@ void Keypad_Init()
 		{
 				.Pin = kpPinout.Rows[idx].GPIO_Pin,
 				.Mode = GPIO_MODE_OUTPUT_PP,
-				.Pull = GPIO_PULLDOWN,
+				.Pull = GPIO_PULLUP,
 				.Speed = GPIO_SPEED_FREQ_LOW,
 				.Alternate = 0
 		};
@@ -42,24 +45,40 @@ void Keypad_Init()
 			{
 					.Pin = kpPinout.Cols[idx].GPIO_Pin,
 					.Mode = GPIO_MODE_INPUT,
-					.Pull = GPIO_NOPULL,
+					.Pull = GPIO_PULLDOWN,
 					.Speed = GPIO_SPEED_FREQ_LOW,
 					.Alternate = 0
 			};
 			HAL_GPIO_Init(kpPinout.Cols[idx].GPIOx,&ColDefault);
 
 			//HAL_GPIO_WritePin(kpPinout.Cols[idx].GPIOx,kpPinout.Cols[idx].GPIO_Pin,GPIO_PIN_RESET);
-		}
+	}
 
-	init_exti();
-}
+	//Setup EXTI interrupts
 
-void init_exti(void) {
-	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGCOMPEN;										// SYSCFG clock enable
-	SYSCFG->EXTICR[2] &= 0;															// set source input to PA pins for interrupt
-	EXTI->IMR |= EXTI_IMR_MR4 | EXTI_IMR_MR5 | EXTI_IMR_MR6 | EXTI_IMR_MR7;			// unmask interrupt request for EXTI Lines 4-7
-	EXTI->RTSR |= EXTI_RTSR_TR4 | EXTI_RTSR_TR5 | EXTI_RTSR_TR6 | EXTI_RTSR_TR7;	// enable rising trigger for EXTI Lines 4-7
-	NVIC->ISER[0] = 1<<EXTI4_15_IRQn;												// acknowledge and enable EXTI interrupt
+	EXTI_ConfigTypeDef IrqSettings =
+	{
+			.Line = EXTI_LINE_8,
+			.Mode = EXTI_MODE_INTERRUPT,
+			.Trigger = EXTI_TRIGGER_RISING,
+			.GPIOSel = EXTI_GPIOA
+	};
+	GPIO_InitTypeDef ItDefault =
+				{
+						.Pin = GPIO_PIN_8,
+						.Mode = GPIO_MODE_IT_RISING,
+						.Pull = GPIO_NOPULL,
+						.Speed = GPIO_SPEED_FREQ_LOW,
+						.Alternate = 0
+				};
+	HAL_GPIO_Init(GPIOA,&ItDefault);
+	EXTI_HandleTypeDef IrqHandle;
+	IrqHandle.Line = IrqSettings.Line;
+	HAL_EXTI_SetConfigLine(&IrqHandle,&IrqSettings);
+	HAL_NVIC_SetPriority(EXTI4_15_IRQn, 2U, 0);
+	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+	//NVIC->ISER[0] = (1<<EXTI4_15_IRQn);
+
 }
 
 // Scans the keypad to find any outputs
@@ -118,14 +137,13 @@ int Keypad_Search_Row(int colIdx)
 	}
 
 	//Reset all row output pins to high
-	for (int idx; idx < KEYPAD_ROW_SIZE; idx++)
+	for (int idx = 0; idx < KEYPAD_ROW_SIZE; idx++)
 	{
 		HAL_GPIO_WritePin(kpPinout.Rows[idx].GPIOx,kpPinout.Rows[idx].GPIO_Pin,GPIO_PIN_SET);
 	}
 
 	return retVal;
 }
-
 
 
 
