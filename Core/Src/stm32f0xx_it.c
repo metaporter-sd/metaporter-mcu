@@ -63,6 +63,13 @@
 /******************************************************************************/
 /*           Cortex-M0 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
+
+void EXTI4_15_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_Callback(GPIO_PIN_8);
+
+}
+
 /**
   * @brief This function handles Non maskable interrupt.
   */

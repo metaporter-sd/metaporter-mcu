@@ -5,6 +5,7 @@
   * @brief          : Header for keypad.c file.
   *
   ******************************************************************************
+**/
 
 /* USER CODE END Header */
 
@@ -26,34 +27,41 @@ extern "C" {
 typedef struct
 {
 	GPIO_TypeDef* GPIOx;	// The port where GPIO is (A..F) utilizing CMSIS, ex: GPIOA
-
 	uint16_t GPIO_Pin;		// The pin number of the GPIO (GPIO_PIN_0..15) utilizing HAL library, ex: GPIO_PIN_O
+}GPIO_Pins;
 
-}GPIO_KeyPinout;
+typedef struct
+{
+	GPIO_Pins Rows[KEYPAD_ROW_SIZE];
+	GPIO_Pins Cols[KEYPAD_COL_SIZE];
+}GPIO_KeypadPinout;
 
-static GPIO_KeyPinout KeypadRowPins[KEYPAD_ROW_SIZE] = {
-		{GPIOA,GPIO_PIN_0},
-		{GPIOA,GPIO_PIN_1},
-		{GPIOA,GPIO_PIN_2},
-		{GPIOA,GPIO_PIN_3}
-};
+// The keypad pinout
+static const GPIO_KeypadPinout kpPinout = {
 
-static GPIO_KeyPinout KeypadColPins[KEYPAD_COL_SIZE] = {
-		{GPIOA,GPIO_PIN_4},
-		{GPIOA,GPIO_PIN_5},
+		.Rows = {
+		{GPIOA,GPIO_PIN_7},
 		{GPIOA,GPIO_PIN_6},
-		{GPIOA,GPIO_PIN_7}
+		{GPIOA,GPIO_PIN_5},
+		{GPIOA,GPIO_PIN_4}
+		},
+
+
+		.Cols = {
+		{GPIOA,GPIO_PIN_3},
+		{GPIOA,GPIO_PIN_2},
+		{GPIOA,GPIO_PIN_1},
+		{GPIOA,GPIO_PIN_0}
+		}
 };
 
 // The keypad matrix mapping
-static char KeyPadMatrix[KEYPAD_ROW_SIZE][KEYPAD_COL_SIZE] = {
-		'1','2','3','A',
-		'4','5','6','B',
-		'7','8','9','C',
-		'*','0','#','D'
+static const char KeyPadMatrix[KEYPAD_ROW_SIZE][KEYPAD_COL_SIZE] = {
+		{'1','2','3','A'},
+		{'4','5','6','B'},
+		{'7','8','9','C'},
+		{'*','0','#','D'}
 };
-
-
 
 
 /* USER CODE BEGIN EFP */

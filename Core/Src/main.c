@@ -24,6 +24,7 @@
 #include "main.h"
 #include "uart.h"
 #include "keypad.h"
+#include "stm32f0xx.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -101,15 +102,25 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	char buttonVal;
-	if(Keypad_Scan(&buttonVal))
-	{
-		fprintf("%c",buttonVal);
-	}
+
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if(GPIO_Pin == GPIO_PIN_8){
+		char buttonVal;
+		if(Keypad_Scan(&buttonVal))
+		{
+			//fprintf("%c",buttonVal);
+		}
+	}
+}
+
+
 
 /**
   * @brief System Clock Configuration

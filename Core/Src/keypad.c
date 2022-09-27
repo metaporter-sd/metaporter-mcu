@@ -10,23 +10,30 @@ static int Keypad_Search_Row(int colIdx);
 // @ReturnVal = None
 void Keypad_Init()
 {
-
+	//Port setup
+	//enable GPIOA RCC
 	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+	/* Enable GPIOA clock (same as enabling ahb rcc)*/
+	//RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+	/* Enable SYSCFG clock */
+	//RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+
+
 	// Setting up row for output high
 	for (int idx = 0; idx < KEYPAD_ROW_SIZE; idx++)
 	{
 		GPIO_InitTypeDef RowDefault =
 		{
-				.Pin = KeypadRowPins[idx].GPIO_Pin,
+				.Pin = kpPinout.Rows[idx].GPIO_Pin,
 				.Mode = GPIO_MODE_OUTPUT_PP,
-				.Pull = GPIO_PULLDOWN,
+				.Pull = GPIO_PULLUP,
 				.Speed = GPIO_SPEED_FREQ_LOW,
 				.Alternate = 0
 		};
-		HAL_GPIO_Init(KeypadRowPins[idx].GPIOx,&RowDefault);
+		HAL_GPIO_Init(kpPinout.Rows[idx].GPIOx,&RowDefault);
 
 		// Toggles to high for output
-		HAL_GPIO_WritePin(KeypadRowPins[idx].GPIOx,KeypadRowPins[idx].GPIO_Pin,GPIO_PIN_SET);
+		HAL_GPIO_WritePin(kpPinout.Rows[idx].GPIOx,kpPinout.Rows[idx].GPIO_Pin,GPIO_PIN_SET);
 
 
 	}
@@ -36,16 +43,41 @@ void Keypad_Init()
 	{
 			GPIO_InitTypeDef ColDefault =
 			{
-					.Pin = KeypadColPins[idx].GPIO_Pin,
+					.Pin = kpPinout.Cols[idx].GPIO_Pin,
 					.Mode = GPIO_MODE_INPUT,
-					.Pull = GPIO_NOPULL,
+					.Pull = GPIO_PULLDOWN,
 					.Speed = GPIO_SPEED_FREQ_LOW,
 					.Alternate = 0
 			};
-			HAL_GPIO_Init(KeypadColPins[idx].GPIOx,&ColDefault);
+			HAL_GPIO_Init(kpPinout.Cols[idx].GPIOx,&ColDefault);
 
-			//HAL_GPIO_WritePin(KeypadColPins[idx].GPIOx,KeypadColPins[idx].GPIO_Pin,GPIO_PIN_RESET);
-		}
+			//HAL_GPIO_WritePin(kpPinout.Cols[idx].GPIOx,kpPinout.Cols[idx].GPIO_Pin,GPIO_PIN_RESET);
+	}
+
+	//Setup EXTI interrupts
+
+	EXTI_ConfigTypeDef IrqSettings =
+	{
+			.Line = EXTI_LINE_8,
+			.Mode = EXTI_MODE_INTERRUPT,
+			.Trigger = EXTI_TRIGGER_RISING,
+			.GPIOSel = EXTI_GPIOA
+	};
+	GPIO_InitTypeDef ItDefault =
+				{
+						.Pin = GPIO_PIN_8,
+						.Mode = GPIO_MODE_IT_RISING,
+						.Pull = GPIO_NOPULL,
+						.Speed = GPIO_SPEED_FREQ_LOW,
+						.Alternate = 0
+				};
+	HAL_GPIO_Init(GPIOA,&ItDefault);
+	EXTI_HandleTypeDef IrqHandle;
+	IrqHandle.Line = IrqSettings.Line;
+	HAL_EXTI_SetConfigLine(&IrqHandle,&IrqSettings);
+	HAL_NVIC_SetPriority(EXTI4_15_IRQn, 2U, 0);
+	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+
 }
 
 // Scans the keypad to find any outputs
@@ -60,7 +92,7 @@ int Keypad_Scan(char* returnChar)
 	for (int colIdx = 0; colIdx < KEYPAD_COL_SIZE; colIdx++)
 	{
 		// If the column pin input is pulled high (registered press)
-		if (HAL_GPIO_ReadPin(KeypadColPins[colIdx].GPIOx,KeypadColPins[colIdx].GPIO_Pin))
+		if (HAL_GPIO_ReadPin(kpPinout.Cols[colIdx].GPIOx,kpPinout.Cols[colIdx].GPIO_Pin))
 		{
 			int rowIdx = Keypad_Search_Row(colIdx);
 			assert(rowIdx != -1);
@@ -91,12 +123,12 @@ int Keypad_Search_Row(int colIdx)
 			uint8_t BitState = GPIO_PIN_RESET; // 0u
 			if(idx == toggleConfig) BitState = GPIO_PIN_SET; // 1u
 
-			HAL_GPIO_WritePin(KeypadRowPins[idx].GPIOx,KeypadRowPins[idx].GPIO_Pin,BitState);
+			HAL_GPIO_WritePin(kpPinout.Rows[idx].GPIOx,kpPinout.Rows[idx].GPIO_Pin,BitState);
 
 		}
 
 		// If the column pin input is still registered as high, (found the corresponding row pin)
-		if (HAL_GPIO_ReadPin(KeypadColPins[colIdx].GPIOx,KeypadColPins[colIdx].GPIO_Pin))
+		if (HAL_GPIO_ReadPin(kpPinout.Cols[colIdx].GPIOx,kpPinout.Cols[colIdx].GPIO_Pin))
 		{
 			retVal = toggleConfig;
 			break;
@@ -104,9 +136,9 @@ int Keypad_Search_Row(int colIdx)
 	}
 
 	//Reset all row output pins to high
-	for (int idx; idx < KEYPAD_ROW_SIZE; idx++)
+	for (int idx = 0; idx < KEYPAD_ROW_SIZE; idx++)
 	{
-		HAL_GPIO_WritePin(KeypadRowPins[idx].GPIOx,KeypadRowPins[idx].GPIO_Pin,GPIO_PIN_SET);
+		HAL_GPIO_WritePin(kpPinout.Rows[idx].GPIOx,kpPinout.Rows[idx].GPIO_Pin,GPIO_PIN_SET);
 	}
 
 	return retVal;
