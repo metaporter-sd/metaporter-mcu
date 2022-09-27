@@ -55,7 +55,15 @@ void Keypad_Init()
 	}
 
 	//Setup EXTI interrupts
-
+	GPIO_InitTypeDef IrqDefault =
+				{
+						.Pin = kpPinout.IrqPin.GPIO_Pin,
+						.Mode = GPIO_MODE_IT_RISING,
+						.Pull = GPIO_NOPULL,
+						.Speed = GPIO_SPEED_FREQ_LOW,
+						.Alternate = 0
+				};
+	/*
 	EXTI_ConfigTypeDef IrqSettings =
 	{
 			.Line = EXTI_LINE_8,
@@ -63,20 +71,17 @@ void Keypad_Init()
 			.Trigger = EXTI_TRIGGER_RISING,
 			.GPIOSel = EXTI_GPIOA
 	};
-	GPIO_InitTypeDef ItDefault =
-				{
-						.Pin = GPIO_PIN_8,
-						.Mode = GPIO_MODE_IT_RISING,
-						.Pull = GPIO_NOPULL,
-						.Speed = GPIO_SPEED_FREQ_LOW,
-						.Alternate = 0
-				};
-	HAL_GPIO_Init(GPIOA,&ItDefault);
+
 	EXTI_HandleTypeDef IrqHandle;
 	IrqHandle.Line = IrqSettings.Line;
 	HAL_EXTI_SetConfigLine(&IrqHandle,&IrqSettings);
-	HAL_NVIC_SetPriority(EXTI4_15_IRQn, 2U, 0);
-	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+	*/
+
+	//If priority needs to be changed, values range from 0-3, where 0 is the highest priority
+	//HAL_NVIC_SetPriority(EXTI4_15_IRQn, 2U, 0);
+
+	HAL_GPIO_Init(kpPinout.IrqPin.GPIOx,&IrqDefault);
+	HAL_NVIC_EnableIRQ(kpPinout.IrqIdx);
 	//NVIC->ISER[0] = (1<<EXTI4_15_IRQn);
 
 }

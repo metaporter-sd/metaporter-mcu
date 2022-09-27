@@ -34,6 +34,8 @@ typedef struct
 {
 	GPIO_Pins Rows[KEYPAD_ROW_SIZE];
 	GPIO_Pins Cols[KEYPAD_COL_SIZE];
+	GPIO_Pins IrqPin;
+	uint16_t IrqIdx;
 }GPIO_KeypadPinout;
 
 // The keypad pinout
@@ -52,7 +54,11 @@ static const GPIO_KeypadPinout kpPinout = {
 		{GPIOA,GPIO_PIN_2},
 		{GPIOA,GPIO_PIN_1},
 		{GPIOA,GPIO_PIN_0}
-		}
+		},
+
+		.IrqPin = {GPIOA,GPIO_PIN_8},
+
+		.IrqIdx = EXTI4_15_IRQn
 };
 
 // The keypad matrix mapping
