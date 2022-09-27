@@ -77,6 +77,7 @@ void Keypad_Init()
 	HAL_EXTI_SetConfigLine(&IrqHandle,&IrqSettings);
 	HAL_NVIC_SetPriority(EXTI4_15_IRQn, 2U, 0);
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+	//NVIC->ISER[0] = (1<<EXTI4_15_IRQn);
 
 }
 

@@ -449,6 +449,7 @@ void Keypad_Init()
 	HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
  800034c:	2007      	movs	r0, #7
  800034e:	f000 fb76 	bl	8000a3e <HAL_NVIC_EnableIRQ>
+	//NVIC->ISER[0] = (1<<EXTI4_15_IRQn);
 
 }
  8000352:	46c0      	nop			; (mov r8, r8)
@@ -516,7 +517,7 @@ int Keypad_Scan(char* returnChar)
  80003b6:	4b0f      	ldr	r3, [pc, #60]	; (80003f4 <Keypad_Scan+0x88>)
  80003b8:	4a0f      	ldr	r2, [pc, #60]	; (80003f8 <Keypad_Scan+0x8c>)
  80003ba:	4810      	ldr	r0, [pc, #64]	; (80003fc <Keypad_Scan+0x90>)
- 80003bc:	2162      	movs	r1, #98	; 0x62
+ 80003bc:	2163      	movs	r1, #99	; 0x63
  80003be:	f001 fa91 	bl	80018e4 <__assert_func>
 			*returnChar = KeyPadMatrix[rowIdx][colIdx];
  80003c2:	4a0f      	ldr	r2, [pc, #60]	; (8000400 <Keypad_Scan+0x94>)
