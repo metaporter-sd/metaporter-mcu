@@ -19,9 +19,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "uart.h"
-#include "lidar.h"
-#include "lcd.h"
-#include "keypad.h"
+#include "utilities.h"
+//#include "lcd.h"
+//#include "keypad.h"
+#include "imu.h"
 #include <stdio.h>
 
 
@@ -89,17 +90,25 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
-  uart3_init();
+  nano_wait(1000000000);
+  //nano_wait(1000000000);
+  //nano_wait(1000000000);
+
+  IMU imu;
+
+  imu_init(&imu, IMU_ADDR, IMU_MODE_NDOF);
+
+//  uart3_init();
   //lidar_init();
-  LCD_Setup();
-  Keypad_Init();
+  //LCD_Setup();
+  //Keypad_Init();
 
   //uart3_test();
 
-  init_spi2();
-  spi2_init_oled();
-  LCD_DrawString(80, 125, BLACK, WHITE,  ("Metaporter"), 16, 0);
-  LCD_DrawString(80, 145, BLACK, WHITE,  ("Time: 0s"), 16, 0);
+  //init_spi2();
+  //spi2_init_oled();
+  //LCD_DrawString(80, 125, BLACK, WHITE,  ("Metaporter"), 16, 0);
+  //LCD_DrawString(80, 145, BLACK, WHITE,  ("Time: 0s"), 16, 0);
 
   //lidar_test_start_stop(); // passes. scope verified
   //lidar_test_send_one(); // passes. scope verified
@@ -185,33 +194,33 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	if(GPIO_Pin == GPIO_PIN_8){
-		char buttonVal;
-		if(Keypad_Scan(&buttonVal))
-		{
-			uart3_send_byte(buttonVal);
-		}
-	}
-}
-
-void EXTI4_15_IRQHandler(void)
-{
-	HAL_GPIO_EXTI_Callback(GPIO_PIN_8);
-
-}
-
-void TIM6_DAC_IRQHandler(void) {
-	char stringy[20];
-    TIM6->SR &= ~TIM_SR_UIF;
-    time_remaining+=1;
-    sprintf(stringy, "Time: %ds", time_remaining);
-    //sprintf(score_string, "Level: %d", level_score);
-    LCD_DrawString(80, 145, BLACK, WHITE,  (stringy), 16, 0);
-
-    spi2_display2(stringy);
-}
+//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+//{
+//	if(GPIO_Pin == GPIO_PIN_8){
+//		char buttonVal;
+//		if(Keypad_Scan(&buttonVal))
+//		{
+//			uart3_send_byte(buttonVal);
+//		}
+//	}
+//}
+//
+//void EXTI4_15_IRQHandler(void)
+//{
+//	HAL_GPIO_EXTI_Callback(GPIO_PIN_8);
+//
+//}
+//
+//void TIM6_DAC_IRQHandler(void) {
+//	char stringy[20];
+//    TIM6->SR &= ~TIM_SR_UIF;
+//    time_remaining+=1;
+//    sprintf(stringy, "Time: %ds", time_remaining);
+//    //sprintf(score_string, "Level: %d", level_score);
+//    LCD_DrawString(80, 145, BLACK, WHITE,  (stringy), 16, 0);
+//
+//    spi2_display2(stringy);
+//}
 
 /* USER CODE END 4 */
 

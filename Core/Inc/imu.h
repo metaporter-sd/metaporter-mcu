@@ -37,40 +37,39 @@ extern "C" {
 #include <stdint.h> // for uint8_t
 #include <string.h> // for strlen() and strcmp()
 
-struct IMU {
-	uint8_t ag_addr;
-	uint8_t mag_addr;
-	int16_t gx, gy, gz; // x, y, and z axis readings of the gyroscope
-	int16_t ax, ay, az; // x, y, and z axis readings of the accelerometer
-	int16_t mx, my, mz; // x, y, and z axis readings of the magnetometer
-	int16_t temperature; // Chip temperature
-	float gBias[3], aBias[3], mBias[3];
-	int16_t gBiasRaw[3], aBiasRaw[3], mBiasRaw[3];
-
-};
-
 // default device addresses
-#define IMU_ADDR 0x29 // default addr
+#define IMU_ADDR 0x28 // default addr
 
-void imu_init(IMU* imu);
-void imu_init_accel(IMU* imu);
-void imu_init_gyro(IMU* imu);
-void imu_init_mag(IMU* imu);
+// operation modes
+#define IMU_MODE_CONFIG 0x00 // imu configuration
+#define IMU_MODE_NDOF 0x0C // fusion mode with mag calibration
 
-void imu_read_accel(IMU* imu);
-void imu_read_gyro(IMU* imu);
-void imu_read_mag(IMU* imu);
-void imu_read_temp(IMU* imu);
+// power mode
+#define IMU_POWER_MODE_NORMAL 0x00
 
-void imu_read_accel(IMU* imu);
-void imu_read_gyro(IMU* imu);
-void imu_read_mag(IMU* imu);
-void imu_read_temp(IMU* imu);
+// imu registers
+#define IMU_PAGE_ID_ADDR 0x07
+#define IMU_OPR_MODE_ADDR 0x3D
+#define IMU_PWR_MODE_ADDR 0x3E
+#define IMU_SYS_TRIGGER_ADDR 0x3F
 
+typedef struct IMU {
+	uint8_t addr;
+	int16_t x, y, z, w; // x, y, z, and w axis readings of the fusion with mag
 
+} IMU;
 
-void imu_set_accel_gyro_mode();
-void imu_set_mag_mode();
+void imu_init(IMU * imu, uint8_t addr, uint8_t mode);
+
+void imu_set_mode(IMU * imu, uint8_t mode);
+
+void imu_set_power_mode(IMU * imu, uint8_t mode);
+
+void imu_set_page(IMU * imu, uint8_t page);
+
+void imu_self_test(IMU * imu);
+
+void imu_reset(IMU * imu);
 
 
 // steps: 

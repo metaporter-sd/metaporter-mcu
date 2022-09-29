@@ -28,7 +28,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "imu.h"
-#include "imu_registers.h"
+#include "utilities.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,7 +48,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t lidar_addr = 0x62; // default 7 bit address
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -139,7 +139,7 @@ int8_t i2c1_send_data(uint8_t devaddr, void *pdata, uint8_t size)
         while ((I2C1->ISR & I2C_ISR_TXIS) == 0)
         {
             count += 1;
-            if (count > 1000000)
+            if (count > 1000000)//1000000
             {
                 return -1;
             }
@@ -153,7 +153,7 @@ int8_t i2c1_send_data(uint8_t devaddr, void *pdata, uint8_t size)
         }
 
         I2C1->TXDR = udata[i] & I2C_TXDR_TXDATA;
-        //nano_wait(1000000);
+        //nano_wait(1000000000);	// caused weird errors
     }
 
     while ((I2C1->ISR & I2C_ISR_TC) == 0 && (I2C1->ISR & I2C_ISR_NACKF) == 0);
@@ -191,12 +191,65 @@ int8_t i2c1_recv_data(uint8_t devaddr, void *pdata, uint8_t size)
     return 0;
 }
 
-void nano_wait(unsigned int n) {
-    asm(    "        mov r0,%0\n"
-            "repeat: sub r0,#83\n"
-            "        bgt repeat\n" : : "r"(n) : "r0", "cc");
+
+void imu_init(IMU* imu, uint8_t addr, uint8_t mode) {
+	i2c1_init();
+	imu->addr = addr;
+
+	imu_set_mode(imu, IMU_MODE_CONFIG);
+	nano_wait(20000000);
+
+	imu_reset(imu);
+	nano_wait(30000000);
+
+	imu_set_power_mode(imu, IMU_POWER_MODE_NORMAL);
+	nano_wait(10000000);
+
+	imu_set_page(imu, 0x00);
+
+	imu_self_test(imu);
+	nano_wait(400000000);
+
+	imu_set_mode(imu, mode);
+	nano_wait(10000000);
 }
 
+void imu_set_mode(IMU * imu, uint8_t mode) {
+	uint8_t mode_data[] = {IMU_OPR_MODE_ADDR, mode};
+//	uint8_t mode_data[2];
+//	mode_data[0] = IMU_OPR_MODE_ADDR;
+//	mode_data[1] = mode;
+
+	i2c1_send_data(imu->addr, mode_data, sizeof(mode_data));
+
+	//nano_wait(30000000);
+}
+
+void imu_set_power_mode(IMU * imu, uint8_t mode) {
+	uint8_t mode_data[] = {IMU_PWR_MODE_ADDR, mode};
+
+	i2c1_send_data(imu->addr, mode_data, sizeof(mode_data));
+
+}
+
+void imu_set_page(IMU * imu, uint8_t page) {
+	uint8_t page_data[] = {IMU_PAGE_ID_ADDR, page};
+
+	i2c1_send_data(imu->addr, page_data, sizeof(page_data));
+
+}
+
+void imu_self_test(IMU * imu) {
+	uint8_t data[] = {IMU_SYS_TRIGGER_ADDR, 0x00}; // set SELF_TST bit
+
+	i2c1_send_data(imu->addr, data, sizeof(data));
+}
+
+void imu_reset(IMU * imu) {
+	uint8_t reset_data[] = {IMU_SYS_TRIGGER_ADDR, 0x20}; // set RST_SYS bit to reset system
+
+	i2c1_send_data(imu->addr, reset_data, sizeof(reset_data));
+}
 
 /* USER CODE END 0 */
 
