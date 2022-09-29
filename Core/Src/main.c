@@ -98,6 +98,8 @@ int main(void)
 
   imu_init(&imu, IMU_ADDR, IMU_MODE_NDOF);
 
+  imu_test(&imu);
+
 //  uart3_init();
   //lidar_init();
   //LCD_Setup();

@@ -195,26 +195,31 @@ int8_t i2c1_recv_data(uint8_t devaddr, void *pdata, uint8_t size)
 void imu_init(IMU* imu, uint8_t addr, uint8_t mode) {
 	i2c1_init();
 	imu->addr = addr;
+	imu->x = imu->y = imu->z = imu->w = 0;
 
-	imu_set_mode(imu, IMU_MODE_CONFIG);
-	nano_wait(20000000);
+//	imu_set_op_mode(imu, IMU_MODE_CONFIG);
+//	nano_wait(20000000);
+//
+//	imu_set_sys_trigger(imu, IMU_RST_SYS); // reset imu
+//	nano_wait(30000000);
+//
+//	imu_set_power_mode(imu, IMU_POWER_MODE_NORMAL);
+//	nano_wait(10000000);
+//
+//	imu_set_page(imu, 0x00);
+//
+//	imu_set_sys_trigger(imu, IMU_SELF_TST); // perform self test
+//	nano_wait(400000000);
 
-	imu_reset(imu);
-	nano_wait(30000000);
+	imu_set_sys_trigger(imu, IMU_RST_INT); // enable interrupt pin
+	imu_set_int_en(imu, IMU_ACC_BSX_DRDY); // enable interrupt
+	imu_set_int_msk(imu, IMU_ACC_BSX_DRDY); // triggers change on int pin
 
-	imu_set_power_mode(imu, IMU_POWER_MODE_NORMAL);
-	nano_wait(10000000);
-
-	imu_set_page(imu, 0x00);
-
-	imu_self_test(imu);
-	nano_wait(400000000);
-
-	imu_set_mode(imu, mode);
+	imu_set_op_mode(imu, mode);
 	nano_wait(10000000);
 }
 
-void imu_set_mode(IMU * imu, uint8_t mode) {
+void imu_set_op_mode(IMU * imu, uint8_t mode) {
 	uint8_t mode_data[] = {IMU_OPR_MODE_ADDR, mode};
 //	uint8_t mode_data[2];
 //	mode_data[0] = IMU_OPR_MODE_ADDR;
@@ -223,6 +228,18 @@ void imu_set_mode(IMU * imu, uint8_t mode) {
 	i2c1_send_data(imu->addr, mode_data, sizeof(mode_data));
 
 	//nano_wait(30000000);
+}
+
+void imu_set_int_en(IMU * imu, uint8_t val) {
+	uint8_t data[] = {IMU_INT_EN, val};
+
+	i2c1_send_data(imu->addr, data, sizeof(data));
+}
+
+void imu_set_int_msk(IMU * imu, uint8_t val) {
+	uint8_t data[] = {IMU_INT_MSK, val};
+
+	i2c1_send_data(imu->addr, data, sizeof(data));
 }
 
 void imu_set_power_mode(IMU * imu, uint8_t mode) {
@@ -239,16 +256,32 @@ void imu_set_page(IMU * imu, uint8_t page) {
 
 }
 
-void imu_self_test(IMU * imu) {
-	uint8_t data[] = {IMU_SYS_TRIGGER_ADDR, 0x00}; // set SELF_TST bit
+void imu_set_sys_trigger(IMU * imu, uint8_t val) {
+	uint8_t data[] = {IMU_SYS_TRIGGER_ADDR, val}; // set RST_SYS bit to reset system
 
 	i2c1_send_data(imu->addr, data, sizeof(data));
 }
 
-void imu_reset(IMU * imu) {
-	uint8_t reset_data[] = {IMU_SYS_TRIGGER_ADDR, 0x20}; // set RST_SYS bit to reset system
+void imu_get_quat(IMU * imu) {
+	uint8_t reg_addr[] = {IMU_QUATERNION_DATA_W_LSB_ADDR}; // set register to read from
 
-	i2c1_send_data(imu->addr, reset_data, sizeof(reset_data));
+	i2c1_send_data(imu->addr, reg_addr, sizeof(reg_addr));
+
+	uint8_t buffer[8];
+	memset(buffer, 0, 8);
+
+	/* Read quat data (8 bytes) */
+	i2c1_recv_data(imu->addr, buffer, sizeof(buffer));
+	imu->w = (((uint16_t)buffer[1]) << 8) | ((uint16_t)buffer[0]);
+	imu->x = (((uint16_t)buffer[3]) << 8) | ((uint16_t)buffer[2]);
+	imu->y = (((uint16_t)buffer[5]) << 8) | ((uint16_t)buffer[4]);
+	imu->z = (((uint16_t)buffer[7]) << 8) | ((uint16_t)buffer[6]);
+
+}
+
+void imu_test(IMU * imu) {
+
+	imu_get_quat(imu);
 }
 
 /* USER CODE END 0 */

@@ -49,9 +49,22 @@ extern "C" {
 
 // imu registers
 #define IMU_PAGE_ID_ADDR 0x07
+#define IMU_INT_MSK 0x0F
+#define IMU_INT_EN 0x10
+#define IMU_QUATERNION_DATA_W_LSB_ADDR 0x20
 #define IMU_OPR_MODE_ADDR 0x3D
 #define IMU_PWR_MODE_ADDR 0x3E
 #define IMU_SYS_TRIGGER_ADDR 0x3F
+
+// sys_trigger bit shift values
+#define IMU_SELF_TST 1
+#define IMU_RST_SYS 1<<5
+#define IMU_RST_INT 1<<6
+
+// int bit shift values
+#define IMU_ACC_BSX_DRDY 1
+
+
 
 typedef struct IMU {
 	uint8_t addr;
@@ -61,15 +74,21 @@ typedef struct IMU {
 
 void imu_init(IMU * imu, uint8_t addr, uint8_t mode);
 
-void imu_set_mode(IMU * imu, uint8_t mode);
+void imu_set_op_mode(IMU * imu, uint8_t mode);
+
+void imu_set_int_en(IMU * imu, uint8_t val);
+
+void imu_set_int_msk(IMU * imu, uint8_t val);
 
 void imu_set_power_mode(IMU * imu, uint8_t mode);
 
 void imu_set_page(IMU * imu, uint8_t page);
 
-void imu_self_test(IMU * imu);
+void imu_set_sys_trigger(IMU * imu, uint8_t val);
 
-void imu_reset(IMU * imu);
+void imu_get_quat(IMU * imu);
+
+void imu_test(IMU * imu);
 
 
 // steps: 
