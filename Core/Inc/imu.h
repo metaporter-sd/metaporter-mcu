@@ -50,8 +50,7 @@ struct IMU {
 };
 
 // default device addresses
-#define IMU_AG_ADDR 0x6B // default addr
-#define IMU_MAG_ADDR 0x1E // default mag addr
+#define IMU_ADDR 0x29 // default addr
 
 void imu_init(IMU* imu);
 void imu_init_accel(IMU* imu);
@@ -74,7 +73,13 @@ void imu_set_accel_gyro_mode();
 void imu_set_mag_mode();
 
 
-
+// steps: 
+// enter config mode to change sensor range and bandwidth or power mode
+// defaults power mode seems pretty good
+// 
+// UNIT_SEL register to select units
+// Use NDOF mode for data col which gives abs orientation 
+// 3.8.2 interrupt settings
 
 
 void i2c1_init(); // setup the I2C channel 1 subsystem
