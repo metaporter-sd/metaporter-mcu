@@ -286,7 +286,7 @@ void imu_test(IMU * imu) {
 
 void init_exti(void) {
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGCOMPEN;	// SYSCFG clock enable
-	SYSCFG->EXTICR[1] |= 1;						// set source input to PB pins for interrupt
+	SYSCFG->EXTICR[0] |= 1<<(4 * 2);			// set source input to PB pins for interrupt
 	EXTI->IMR |= EXTI_IMR_MR2;					// unmask interrupt request for EXTI Lines 2
 	EXTI->RTSR |= EXTI_RTSR_TR2;				// enable rising trigger for EXTI Lines 2
 	NVIC->ISER[0] = 1<<EXTI2_3_IRQn;			// acknowledge and enable EXTI interrupt
