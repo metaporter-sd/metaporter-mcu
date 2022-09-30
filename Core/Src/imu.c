@@ -196,9 +196,12 @@ int8_t i2c1_recv_data(uint8_t devaddr, void *pdata, uint8_t size)
 
 void imu_init(IMU* imu, uint8_t addr, uint8_t mode) {
 	i2c1_init();
-	init_exti_pb2();
+//	init_exti_pb2();
+
 	imu->addr = addr;
 	imu->x = imu->y = imu->z = imu->w = 0;
+	imu->curr_page = 0;
+	imu->fw_ver = (((uint16_t)0x3) << 8) | ((uint16_t)0x11);
 
 //	imu_set_op_mode(imu, IMU_MODE_CONFIG);
 //	nano_wait(20000000);
@@ -206,7 +209,7 @@ void imu_init(IMU* imu, uint8_t addr, uint8_t mode) {
 //	imu_set_sys_trigger(imu, IMU_RST_SYS); // reset imu
 //	nano_wait(30000000);
 //
-//	imu_set_power_mode(imu, IMU_POWER_MODE_NORMAL);
+//	imu_set_power_mode(imu, IMU_POWER_MODE_NORMAL);		// doesn't work
 //	nano_wait(10000000);
 //
 //	imu_set_page(imu, 0x00);
@@ -214,9 +217,12 @@ void imu_init(IMU* imu, uint8_t addr, uint8_t mode) {
 //	imu_set_sys_trigger(imu, IMU_SELF_TST); // perform self test
 //	nano_wait(400000000);
 
-	imu_set_sys_trigger(imu, IMU_RST_INT); // enable interrupt pin
-	imu_set_int_en(imu, IMU_ACC_BSX_DRDY); // enable interrupt
-	imu_set_int_msk(imu, IMU_ACC_BSX_DRDY); // triggers change on int pin
+//	imu_get_fw_ver(imu);
+
+//	imu_set_sys_trigger(imu, IMU_RST_INT); // enable interrupt pin
+//	imu_set_int_en(imu, IMU_ACC_BSX_DRDY); // enable interrupt
+//	imu_set_int_msk(imu, IMU_ACC_BSX_DRDY); // triggers change on int pin
+//	imu_set_page(imu, 0x00);
 
 	imu_set_op_mode(imu, mode);
 	nano_wait(10000000);
@@ -234,12 +240,20 @@ void imu_set_op_mode(IMU * imu, uint8_t mode) {
 }
 
 void imu_set_int_en(IMU * imu, uint8_t val) {
+	if ( imu->curr_page != 1 ) {
+		imu_set_page(imu, 0x01);
+	}
+
 	uint8_t data[] = {IMU_INT_EN, val};
 
 	i2c1_send_data(imu->addr, data, sizeof(data));
 }
 
 void imu_set_int_msk(IMU * imu, uint8_t val) {
+	if ( imu->curr_page != 1 ) {
+		imu_set_page(imu, 0x01);
+	}
+
 	uint8_t data[] = {IMU_INT_MSK, val};
 
 	i2c1_send_data(imu->addr, data, sizeof(data));
@@ -257,6 +271,7 @@ void imu_set_page(IMU * imu, uint8_t page) {
 
 	i2c1_send_data(imu->addr, page_data, sizeof(page_data));
 
+	imu->curr_page = page;
 }
 
 void imu_set_sys_trigger(IMU * imu, uint8_t val) {
@@ -266,7 +281,8 @@ void imu_set_sys_trigger(IMU * imu, uint8_t val) {
 }
 
 void imu_get_quat(IMU * imu) {
-	uint8_t reg_addr[] = {IMU_QUATERNION_DATA_W_LSB_ADDR}; // set register to read from
+	uint8_t reg_addr[1];
+	reg_addr[0] = IMU_QUATERNION_DATA_W_LSB_ADDR; // set register to read from
 
 	i2c1_send_data(imu->addr, reg_addr, sizeof(reg_addr));
 
@@ -280,6 +296,19 @@ void imu_get_quat(IMU * imu) {
 	imu->y = (((uint16_t)buffer[5]) << 8) | ((uint16_t)buffer[4]);
 	imu->z = (((uint16_t)buffer[7]) << 8) | ((uint16_t)buffer[6]);
 
+}
+
+void imu_get_fw_ver(IMU * imu) {
+	uint8_t reg_addr[] = {0x04}; // set register to read
+
+	i2c1_send_data(imu->addr, reg_addr, sizeof(reg_addr));
+
+	uint8_t buffer[2];
+
+	/* Read fw_ver data (8 bytes) */
+	i2c1_recv_data(imu->addr, buffer, sizeof(buffer));
+
+	imu->fw_ver = (((uint16_t)buffer[1]) << 8) | ((uint16_t)buffer[0]);
 }
 
 void imu_test(IMU * imu) {
@@ -296,6 +325,17 @@ void init_exti_pb2(void) {
 	EXTI->IMR |= EXTI_IMR_MR2;					// unmask interrupt request for EXTI Line 2
 	EXTI->RTSR |= EXTI_RTSR_TR2;				// enable rising trigger for EXTI Line 2
 	NVIC->ISER[0] = 1<<EXTI2_3_IRQn;			// acknowledge and enable EXTI interrupt
+}
+
+void init_tim7(void) {
+    TIM7->CR1 &= ~TIM_CR1_CEN;
+
+    RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;	// enable timer 7
+    TIM7->PSC = 48000-1;				// Look below for timer speed
+    TIM7->ARR = 10-1;					// 48000000 / 48000 / 10 = 100 Hz
+    TIM7->DIER |= TIM_DIER_UIE;			// enable update on interrupt
+    NVIC->ISER[0] = 1<<TIM7_IRQn;		// enable interrupt handler
+    TIM7->CR1 |= TIM_CR1_CEN;			// enable timer clock
 }
 
 /* USER CODE END 0 */

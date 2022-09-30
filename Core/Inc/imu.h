@@ -69,7 +69,8 @@ extern "C" {
 typedef struct IMU {
 	uint8_t addr;
 	int16_t x, y, z, w; // x, y, z, and w axis readings of the fusion with mag
-
+	uint8_t curr_page;
+	uint16_t fw_ver;
 } IMU;
 
 void imu_init(IMU * imu, uint8_t addr, uint8_t mode);
@@ -87,6 +88,8 @@ void imu_set_page(IMU * imu, uint8_t page);
 void imu_set_sys_trigger(IMU * imu, uint8_t val);
 
 void imu_get_quat(IMU * imu);
+
+void imu_get_fw_ver(IMU * imu);
 
 void imu_test(IMU * imu);
 
@@ -108,6 +111,7 @@ int8_t i2c1_send_data(uint8_t devaddr, void *pdata, uint8_t size);
 int8_t i2c1_recv_data(uint8_t devaddr, void *pdata, uint8_t size);
 
 void init_exti_pb2(void);
+void init_tim7(void);
 
 #ifdef __cplusplus
 }

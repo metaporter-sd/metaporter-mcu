@@ -49,6 +49,8 @@
 
 /* USER CODE BEGIN PV */
 int time_remaining = 0;
+int count = 0;
+IMU imu;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -94,9 +96,8 @@ int main(void)
 
   nano_wait(1000000000);
 
-  IMU imu;
-
   imu_init(&imu, IMU_ADDR, IMU_MODE_NDOF);
+  init_tim7();
 
 //  imu_test(&imu);
 
@@ -154,6 +155,13 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+//	  	char data_string[64];
+//
+//		imu_get_quat(&imu);
+//		// send data as string
+//		sprintf(data_string, "(%d, %d, %d, %d)\n\r", imu.x, imu.y, imu.z, imu.w);
+//		uart3_send_string(data_string);
+//		nano_wait(100000000);
 
     /* USER CODE BEGIN 3 */
   }
@@ -196,10 +204,33 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-void EXTI2_3_IRQHandler(void) {
-	uart3_send_byte('c');
-	EXTI->PR |= EXTI_PR_PR2;
+void TIM7_IRQHandler(void) {
+	//DMA1->IFCR |= DMA_IFCR_CGIF7;
+
+	if ( count < 1000 ) {
+
+		char data_string[64];
+
+		imu_get_quat(&imu);
+		// send data as string
+		sprintf(data_string, "(%d, %d, %d, %d)\n\r", imu.x, imu.y, imu.z, imu.w);
+		uart3_send_string(data_string);
+	}
+	count++;
+
+	TIM7->SR &= ~TIM_SR_UIF;
 }
+
+//void EXTI2_3_IRQHandler(void) {
+//	char data_string[64];
+//
+//	imu_get_quat(&imu);
+//	// send data as string
+//	sprintf(data_string, "(%d, %d, %d, %d)\n\r", imu.x, imu.y, imu.z, imu.w);
+//	uart3_send_string(data_string);
+//
+//	EXTI->PR |= EXTI_PR_PR2;
+//}
 
 //void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 //{
