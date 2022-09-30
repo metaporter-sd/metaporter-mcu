@@ -1,15 +1,15 @@
 /*
- * utilities.c
+ * timers.c
  *
- *  Created on: Sep 26, 2022
- *  Author: Jehan Shah
+ *  Created on: Sep 30, 2022
+ *  Author: Kris Kunovski
  */
 
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : utilities.c
-  * @brief          : functions used for different utilities
+  * @file           : timers.c
+  * @brief          : functions to use timers
   ******************************************************************************
   * @attention
   *
@@ -27,7 +27,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "utilities.h"
+#include "timers.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,10 +59,15 @@
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void nano_wait(unsigned int n) {
-    asm(    "        mov r0,%0\n"
-            "repeat: sub r0,#83\n"
-            "        bgt repeat\n" : : "r"(n) : "r0", "cc");
+void init_tim7(void) {
+    TIM7->CR1 &= ~TIM_CR1_CEN;
+
+    RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;	// enable timer 7
+    TIM7->PSC = 48000-1;				// Look below for timer speed
+    TIM7->ARR = 10-1;					// 48000000 / 48000 / 10 = 100 Hz
+    TIM7->DIER |= TIM_DIER_UIE;			// enable update on interrupt
+    NVIC->ISER[0] = 1<<TIM7_IRQn;		// enable interrupt handler
+    TIM7->CR1 |= TIM_CR1_CEN;			// enable timer clock
 }
 
 /* USER CODE END 0 */

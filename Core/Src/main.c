@@ -20,6 +20,7 @@
 #include "main.h"
 #include "uart.h"
 #include "utilities.h"
+#include "timers.h"
 //#include "lcd.h"
 //#include "keypad.h"
 #include "imu.h"

@@ -327,17 +327,6 @@ void init_exti_pb2(void) {
 	NVIC->ISER[0] = 1<<EXTI2_3_IRQn;			// acknowledge and enable EXTI interrupt
 }
 
-void init_tim7(void) {
-    TIM7->CR1 &= ~TIM_CR1_CEN;
-
-    RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;	// enable timer 7
-    TIM7->PSC = 48000-1;				// Look below for timer speed
-    TIM7->ARR = 10-1;					// 48000000 / 48000 / 10 = 100 Hz
-    TIM7->DIER |= TIM_DIER_UIE;			// enable update on interrupt
-    NVIC->ISER[0] = 1<<TIM7_IRQn;		// enable interrupt handler
-    TIM7->CR1 |= TIM_CR1_CEN;			// enable timer clock
-}
-
 /* USER CODE END 0 */
 
 

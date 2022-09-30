@@ -111,7 +111,6 @@ int8_t i2c1_send_data(uint8_t devaddr, void *pdata, uint8_t size);
 int8_t i2c1_recv_data(uint8_t devaddr, void *pdata, uint8_t size);
 
 void init_exti_pb2(void);
-void init_tim7(void);
 
 #ifdef __cplusplus
 }
