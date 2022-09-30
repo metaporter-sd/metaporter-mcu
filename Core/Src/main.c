@@ -90,17 +90,16 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
+  uart3_init();
+
   nano_wait(1000000000);
-  //nano_wait(1000000000);
-  //nano_wait(1000000000);
 
   IMU imu;
 
   imu_init(&imu, IMU_ADDR, IMU_MODE_NDOF);
 
-  imu_test(&imu);
+//  imu_test(&imu);
 
-//  uart3_init();
   //lidar_init();
   //LCD_Setup();
   //Keypad_Init();
@@ -196,6 +195,12 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void EXTI2_3_IRQHandler(void) {
+	uart3_send_byte('c');
+	EXTI->PR |= EXTI_PR_PR2;
+}
+
 //void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 //{
 //	if(GPIO_Pin == GPIO_PIN_8){

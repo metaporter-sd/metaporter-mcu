@@ -29,6 +29,8 @@
 /* USER CODE BEGIN Includes */
 #include "imu.h"
 #include "utilities.h"
+
+#include "uart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -194,6 +196,7 @@ int8_t i2c1_recv_data(uint8_t devaddr, void *pdata, uint8_t size)
 
 void imu_init(IMU* imu, uint8_t addr, uint8_t mode) {
 	i2c1_init();
+	init_exti_pb2();
 	imu->addr = addr;
 	imu->x = imu->y = imu->z = imu->w = 0;
 
@@ -211,9 +214,9 @@ void imu_init(IMU* imu, uint8_t addr, uint8_t mode) {
 //	imu_set_sys_trigger(imu, IMU_SELF_TST); // perform self test
 //	nano_wait(400000000);
 
-//	imu_set_sys_trigger(imu, IMU_RST_INT); // enable interrupt pin
-//	imu_set_int_en(imu, IMU_ACC_BSX_DRDY); // enable interrupt
-//	imu_set_int_msk(imu, IMU_ACC_BSX_DRDY); // triggers change on int pin
+	imu_set_sys_trigger(imu, IMU_RST_INT); // enable interrupt pin
+	imu_set_int_en(imu, IMU_ACC_BSX_DRDY); // enable interrupt
+	imu_set_int_msk(imu, IMU_ACC_BSX_DRDY); // triggers change on int pin
 
 	imu_set_op_mode(imu, mode);
 	nano_wait(10000000);
@@ -284,16 +287,15 @@ void imu_test(IMU * imu) {
 	imu_get_quat(imu);
 }
 
-void init_exti(void) {
+void init_exti_pb2(void) {
+	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;			// enable GPIO pin B
+	GPIOB->PUPDR &= ~(GPIO_PUPDR_PUPDR2);		// clear pull-up/pull-down reg
+	GPIOB->PUPDR |= GPIO_PUPDR_PUPDR2_1;		// set pupdr to pull-down for GPIO pin B
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGCOMPEN;	// SYSCFG clock enable
 	SYSCFG->EXTICR[0] |= 1<<(4 * 2);			// set source input to PB pins for interrupt
-	EXTI->IMR |= EXTI_IMR_MR2;					// unmask interrupt request for EXTI Lines 2
-	EXTI->RTSR |= EXTI_RTSR_TR2;				// enable rising trigger for EXTI Lines 2
+	EXTI->IMR |= EXTI_IMR_MR2;					// unmask interrupt request for EXTI Line 2
+	EXTI->RTSR |= EXTI_RTSR_TR2;				// enable rising trigger for EXTI Line 2
 	NVIC->ISER[0] = 1<<EXTI2_3_IRQn;			// acknowledge and enable EXTI interrupt
-}
-
-void EXTI2_3_IRQHandler(void) {
-
 }
 
 /* USER CODE END 0 */
