@@ -211,9 +211,9 @@ void imu_init(IMU* imu, uint8_t addr, uint8_t mode) {
 //	imu_set_sys_trigger(imu, IMU_SELF_TST); // perform self test
 //	nano_wait(400000000);
 
-	imu_set_sys_trigger(imu, IMU_RST_INT); // enable interrupt pin
-	imu_set_int_en(imu, IMU_ACC_BSX_DRDY); // enable interrupt
-	imu_set_int_msk(imu, IMU_ACC_BSX_DRDY); // triggers change on int pin
+//	imu_set_sys_trigger(imu, IMU_RST_INT); // enable interrupt pin
+//	imu_set_int_en(imu, IMU_ACC_BSX_DRDY); // enable interrupt
+//	imu_set_int_msk(imu, IMU_ACC_BSX_DRDY); // triggers change on int pin
 
 	imu_set_op_mode(imu, mode);
 	nano_wait(10000000);
