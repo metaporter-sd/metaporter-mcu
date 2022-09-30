@@ -22,7 +22,7 @@ extern "C" {
 
 void dma1_init(void);
 
-void dma1_start(void * src, void * dst, uint16_t num_bytes);
+void dma1_start(void * src, uint32_t dst, uint16_t num_bytes);
 
 
 /* Private defines -----------------------------------------------------------*/

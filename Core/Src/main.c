@@ -182,7 +182,7 @@ void TIM7_IRQHandler(void) {
 //	DMA1->IFCR |= DMA_IFCR_CGIF7;
 	// int timeout = 8000; // times out after 5ms
 
-	if ( count < 10 ) {
+	if ( count < 50 ) {
 
 //		for (int i = 0; i < timeout; i++) {
 //			if (dma_transfers_started == dma_transfers_completed) {
@@ -193,11 +193,11 @@ void TIM7_IRQHandler(void) {
 
 		imu_get_quat(&imu);
 
-		char data_string[64];
+		char data_string[100];
 		// send data as string
 		sprintf(data_string, "(%d, %d, %d, %d)\n\r", imu.quat[0], imu.quat[1], imu.quat[2], imu.quat[3]);
 
-		dma1_start(data_string, &(USART3->TDR), sizeof(data_string));
+		dma1_start(data_string, (uint32_t) &(USART3->TDR), strlen(data_string));
 
 
 //		dma1_start(imu.quat, &(USART3->TDR), sizeof(imu.quat));	// sends imu data as bytes
