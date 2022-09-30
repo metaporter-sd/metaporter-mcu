@@ -64,7 +64,7 @@ void i2c1_init()
 	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
 	GPIOB->MODER &= ~(GPIO_MODER_MODER6 | GPIO_MODER_MODER7);
 	GPIOB->MODER |= GPIO_MODER_MODER6_1 | GPIO_MODER_MODER7_1;
-	GPIOB->AFR[0] |= (1 << 4*6) | (1 << 4 * 7);
+	GPIOB->AFR[0] |= (1 << 4 * 6) | (1 << 4 * 7);
 
     RCC->APB1ENR |= RCC_APB1ENR_I2C1EN;
 
@@ -282,6 +282,18 @@ void imu_get_quat(IMU * imu) {
 void imu_test(IMU * imu) {
 
 	imu_get_quat(imu);
+}
+
+void init_exti(void) {
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGCOMPEN;	// SYSCFG clock enable
+	SYSCFG->EXTICR[1] |= 1;						// set source input to PB pins for interrupt
+	EXTI->IMR |= EXTI_IMR_MR2;					// unmask interrupt request for EXTI Lines 2
+	EXTI->RTSR |= EXTI_RTSR_TR2;				// enable rising trigger for EXTI Lines 2
+	NVIC->ISER[0] = 1<<EXTI2_3_IRQn;			// acknowledge and enable EXTI interrupt
+}
+
+void EXTI2_3_IRQHandler(void) {
+
 }
 
 /* USER CODE END 0 */
