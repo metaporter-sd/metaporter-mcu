@@ -68,7 +68,7 @@ extern "C" {
 
 typedef struct IMU {
 	uint8_t addr;
-	int16_t x, y, z, w; // x, y, z, and w axis readings of the fusion with mag
+	int16_t quat[4]; // w, x, y, & z axis readings of the fusion with mag
 	uint8_t curr_page;
 	uint16_t fw_ver;
 } IMU;

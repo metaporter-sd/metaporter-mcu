@@ -1,8 +1,8 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : timers.h
-  * @brief          : Header for timers.
+  * @file           : dma.h
+  * @brief          : Header for dma.
   *
   ******************************************************************************
 **/
@@ -10,8 +10,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __TIMERS_H
-#define __TIMERS_H
+#ifndef __DMA_H
+#define __DMA_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,11 +20,9 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_hal.h"
 
-void tim7_init(void);
+void dma1_init(void);
 
-void tim7_start(void);
-
-void tim7_stop(void);
+void dma1_start(void * src, void * dst, uint16_t num_bytes);
 
 
 /* Private defines -----------------------------------------------------------*/

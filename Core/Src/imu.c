@@ -199,7 +199,7 @@ void imu_init(IMU* imu, uint8_t addr, uint8_t mode) {
 //	init_exti_pb2();
 
 	imu->addr = addr;
-	imu->x = imu->y = imu->z = imu->w = 0;
+	imu->quat[0] = imu->quat[1] = imu->quat[2] = imu->quat[3] = 0;
 	imu->curr_page = 0;
 	imu->fw_ver = (((uint16_t)0x3) << 8) | ((uint16_t)0x11);
 
@@ -291,10 +291,10 @@ void imu_get_quat(IMU * imu) {
 
 	/* Read quat data (8 bytes) */
 	i2c1_recv_data(imu->addr, buffer, sizeof(buffer));
-	imu->w = (((uint16_t)buffer[1]) << 8) | ((uint16_t)buffer[0]);
-	imu->x = (((uint16_t)buffer[3]) << 8) | ((uint16_t)buffer[2]);
-	imu->y = (((uint16_t)buffer[5]) << 8) | ((uint16_t)buffer[4]);
-	imu->z = (((uint16_t)buffer[7]) << 8) | ((uint16_t)buffer[6]);
+	imu->quat[0] = (((uint16_t)buffer[1]) << 8) | ((uint16_t)buffer[0]);
+	imu->quat[1] = (((uint16_t)buffer[3]) << 8) | ((uint16_t)buffer[2]);
+	imu->quat[2] = (((uint16_t)buffer[5]) << 8) | ((uint16_t)buffer[4]);
+	imu->quat[3] = (((uint16_t)buffer[7]) << 8) | ((uint16_t)buffer[6]);
 
 }
 

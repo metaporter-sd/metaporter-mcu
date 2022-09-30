@@ -23,6 +23,7 @@
 #include "timers.h"
 //#include "lcd.h"
 //#include "keypad.h"
+#include "dma.h"
 #include "imu.h"
 #include <stdio.h>
 
@@ -51,6 +52,9 @@
 /* USER CODE BEGIN PV */
 int time_remaining = 0;
 int count = 0;
+int dma_transfers_started = 0;
+int dma_transfers_completed = 0;
+char dma_test[8] = "hello\n\r";
 IMU imu;
 /* USER CODE END PV */
 
@@ -98,57 +102,19 @@ int main(void)
   nano_wait(1000000000);
 
   imu_init(&imu, IMU_ADDR, IMU_MODE_NDOF);
-  init_tim7();
+  dma1_init();
+  tim7_init();
+  tim7_start();						// enable timer 7 clock
+
+  imu_get_quat(&imu);
 
 //  imu_test(&imu);
 
-  //lidar_init();
   //LCD_Setup();
   //Keypad_Init();
 
   //uart3_test();
 
-  //init_spi2();
-  //spi2_init_oled();
-  //LCD_DrawString(80, 125, BLACK, WHITE,  ("Metaporter"), 16, 0);
-  //LCD_DrawString(80, 145, BLACK, WHITE,  ("Time: 0s"), 16, 0);
-
-  //lidar_test_start_stop(); // passes. scope verified
-  //lidar_test_send_one(); // passes. scope verified
-  //lidar_test_send(); // passes. scope verified
-  //lidar_test_read_one();  // passes. scope verified
-  //lidar_wait_for_data(); // passes. scope verified
-  //lidar_test_get_one_distance(); // passes. scope verified. Reading takes a long time to be ready
-  /*
-#define LIDAR_BUFFER_SIZE 200
-  uart3_test();
-
-  // UART buffer for lidar data
-  uint8_t header[2];
-  uart3_create_header(header, UART_COM_NONE, UART_DATA_SOURCE_LIDAR, UART_UINT16_T, LIDAR_BUFFER_SIZE);
-
-  char dist_string[8];
-
-  // send header as string
-  sprintf(dist_string, "%d", header[0]);
-  uart3_send_string(dist_string);
-  uart3_send_string("\n\r");
-
-  sprintf(dist_string, "%d", header[1]);
-  uart3_send_string(dist_string);
-  uart3_send_string("\n\r");
-
-  // read lidar data into buffer and send as string
-  uint16_t dist[LIDAR_BUFFER_SIZE];
-  for (int i = 0; i < LIDAR_BUFFER_SIZE; i++) {
-	  lidar_get_distance(&dist[i]);
-
-	  // send over uart as string
-	  sprintf(dist_string, "%d", dist[i]);
-	  uart3_send_string(dist_string);
-	  uart3_send_string("\n\r");
-  }
-  */
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -205,17 +171,37 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+//void DMA1_Ch4_7_DMA2_Ch3_5_IRQHandler(void) {
+//	if ( DMA1->ISR && DMA_ISR_TCIF7 ) {
+//		DMA1->IFCR |= DMA_IFCR_CTCIF7;
+//		dma_transfers_completed++;
+//	}
+//}
+
 void TIM7_IRQHandler(void) {
-	//DMA1->IFCR |= DMA_IFCR_CGIF7;
+//	DMA1->IFCR |= DMA_IFCR_CGIF7;
+	// int timeout = 8000; // times out after 5ms
 
-	if ( count < 1000 ) {
+	if ( count < 10 ) {
 
-		char data_string[64];
+//		for (int i = 0; i < timeout; i++) {
+//			if (dma_transfers_started == dma_transfers_completed) {
+//				break;
+//			}
+//			nano_wait(1000);
+//		}
 
 		imu_get_quat(&imu);
+
+		char data_string[64];
 		// send data as string
-		sprintf(data_string, "(%d, %d, %d, %d)\n\r", imu.x, imu.y, imu.z, imu.w);
-		uart3_send_string(data_string);
+		sprintf(data_string, "(%d, %d, %d, %d)\n\r", imu.quat[0], imu.quat[1], imu.quat[2], imu.quat[3]);
+
+		dma1_start(data_string, &(USART3->TDR), sizeof(data_string));
+
+
+//		dma1_start(imu.quat, &(USART3->TDR), sizeof(imu.quat));	// sends imu data as bytes
+		//dma_transfers_started++;
 	}
 	count++;
 

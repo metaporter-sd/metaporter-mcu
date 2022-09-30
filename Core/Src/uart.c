@@ -82,6 +82,7 @@ void uart3_init(void) {
 	USART3->CR1 &= ~USART_CR1_PCE;			// Disable parity control
 	USART3->CR1 &= ~USART_CR1_OVER8;		// Set oversampling by 16
 	USART3->BRR = 0x1a1;					// Set baud rate to 115200 bits/s (0x1a1 = 417 = 48000000 / 115200)
+	USART3->CR3 |= USART_CR3_DMAT;          // Enable USART3 transmitter DMA
 	USART3->CR1 |= 1<<2;					// Receiver is enabled
 	USART3->CR1 |= 1<<3;					// Transmitter is enabled
 	USART3->CR1 |= 1;						// Enable UE (USART3)

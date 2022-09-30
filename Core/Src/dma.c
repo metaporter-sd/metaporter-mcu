@@ -1,15 +1,15 @@
 /*
- * timers.c
+ * dma.c
  *
- *  Created on: Sep 30, 2022
- *  Author: Kris Kunovski
+ *  Created on: Sep 26, 2022
+ *  Author: Jehan Shah
  */
 
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : timers.c
-  * @brief          : functions to use timers
+  * @file           : dma.c
+  * @brief          : functions used for dma transfer
   ******************************************************************************
   * @attention
   *
@@ -27,7 +27,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "timers.h"
+#include "dma.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,23 +59,27 @@
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void tim7_init(void) {
-    TIM7->CR1 &= ~TIM_CR1_CEN;
+void dma1_init(void) {
 
-    RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;	// enable timer 7
-    TIM7->PSC = 48000-1;				// Look below for timer speed
-    TIM7->ARR = 10-1;					// 48000000 / 48000 / 10 = 100 Hz
-    TIM7->DIER |= TIM_DIER_UIE;			// enable update on interrupt
-    NVIC->ISER[0] = 1<<TIM7_IRQn;		// enable interrupt handler
+    RCC->AHBENR |= RCC_AHBENR_DMA1EN;
+    DMA1_Channel7->CCR &= ~DMA_CCR_EN;					// Make sure DMA is off
+    DMA1_Channel7->CCR |= DMA_CCR_DIR;					// Read from "memory"
+    DMA1_Channel7->CCR |= DMA_CCR_MINC;					// Increment CMAR as we copy
+    DMA1_Channel7->CCR &= ~(DMA_CCR_PSIZE);				// 00: 8 bits
+    DMA1_Channel7->CCR &= ~(DMA_CCR_MSIZE);				// 00: 8 bits
+//    DMA1_Channel7->CCR |= DMA_CCR_CIRC;					// Enable circular buffer
+//    DMA1_Channel7->CCR |= DMA_CCR_TCIE;					// Enable transfer complete interrupt
+//    NVIC->ISER[0] = 1<<DMA1_Channel4_5_6_7_IRQn;		// Enable the interrupt
 
 }
 
-void tim7_start(void) {
-	TIM7->CR1 |= TIM_CR1_CEN;			// enable timer clock
-}
+void dma1_start(void * src, void * dst, uint16_t num_bytes) {
+	DMA1_Channel7->CCR &= ~1;				// disable DMA
+    DMA1_Channel7->CMAR = (uint32_t)(src);	// Copy from address in CMAR
+    DMA1_Channel7->CPAR = (uint32_t)(dst);	// Copy to address in CPAR (USART3 TX)
+    DMA1_Channel7->CNDTR = num_bytes;		// Copy this many data
+    DMA1_Channel7->CCR |= 1;				// Enable DMA
 
-void tim7_stop(void) {
-	TIM7->CR1 &= ~TIM_CR1_CEN;			// disable timer clock
 }
 
 /* USER CODE END 0 */
