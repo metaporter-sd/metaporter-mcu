@@ -59,14 +59,30 @@
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void tim7_init(void) {
-    TIM7->CR1 &= ~TIM_CR1_CEN;
+void tim6_init(void) {
+  TIM6->CR1 &= ~TIM_CR1_CEN;
+  RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
+  TIM6->PSC = 48000-1;
+  TIM6->ARR = 1000-1;
+  TIM6->DIER |= TIM_DIER_UIE;
+  NVIC->ISER[0] = 1<<TIM6_DAC_IRQn;
+}
 
-    RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;	// enable timer 7
-    TIM7->PSC = 48000-1;				// Look below for timer speed
-    TIM7->ARR = 10-1;					// 48000000 / 48000 / 10 = 100 Hz
-    TIM7->DIER |= TIM_DIER_UIE;			// enable update on interrupt
-    NVIC->ISER[0] = 1<<TIM7_IRQn;		// enable interrupt handler
+void tim6_start(void) {
+	TIM6->CR1 |= TIM_CR1_CEN;			// enable timer clock
+}
+
+void tim6_stop(void) {
+	TIM6->CR1 &= ~TIM_CR1_CEN;			// disable timer clock
+}
+
+void tim7_init(void) {
+  TIM7->CR1 &= ~TIM_CR1_CEN;
+  RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;	// enable timer 7
+  TIM7->PSC = 48000-1;				// Look below for timer speed
+  TIM7->ARR = 10-1;					// 48000000 / 48000 / 10 = 100 Hz
+  TIM7->DIER |= TIM_DIER_UIE;			// enable update on interrupt
+  NVIC->ISER[0] = 1<<TIM7_IRQn;		// enable interrupt handler
 
 }
 
@@ -77,7 +93,6 @@ void tim7_start(void) {
 void tim7_stop(void) {
 	TIM7->CR1 &= ~TIM_CR1_CEN;			// disable timer clock
 }
-
 /* USER CODE END 0 */
 
 

@@ -20,10 +20,12 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_hal.h"
 
+void tim6_init(void);
+void tim6_start(void);
+void tim6_stop(void);
+
 void tim7_init(void);
-
 void tim7_start(void);
-
 void tim7_stop(void);
 
 
