@@ -74,8 +74,8 @@ extern lcd_dev_t lcddev;
 void lcd_setup(void);
 void lcd_init(void (*reset)(int), void (*select)(int), void (*reg_select)(int));
 void lcd_clear(u16 Color);
-void lcd_drawChar(u16 x,u16 y,u16 fc, u16 bc, char num, u8 size, u8 mode);
-void lcd_drawString(u16 x,u16 y, u16 fc, u16 bg, const char *p, u8 size, u8 mode);
+void lcd_draw_char(u16 x,u16 y,u16 fc, u16 bc, char num, u8 size, u8 mode);
+void lcd_draw_string(u16 x,u16 y, u16 fc, u16 bg, const char *p, u8 size, u8 mode);
 void lcd_update_status(char * status);
 
 #endif

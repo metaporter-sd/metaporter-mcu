@@ -17,6 +17,8 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <stdio.h>
+
 #include "main.h"
 #include "utilities.h"
 #include "timers.h"
@@ -24,8 +26,8 @@
 #include "dma.h"
 #include "lcd.h"
 #include "imu.h"
-#include <stdio.h>
 
+#include "test.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -102,13 +104,18 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
-  keypad_init();
+  //keypad_init();
   uart3_init();
   dma1_init();
+  lcd_setup();
   nano_wait(1000000000);
   imu_init(&imu, IMU_ADDR, IMU_MODE_NDOF);
   tim6_init();
   tim7_init();
+
+
+  init_exti_pa0(); // for testing
+  init_exti_pb2(); // for testing
 
   /* USER CODE END 2 */
 
@@ -170,20 +177,20 @@ void SystemClock_Config(void)
 
 void EXTI0_1_IRQHandler(void) { // TODO: copy this over to keypad based interrupt where status = data_col
 	time_elapsed = 0; 
+	lcd_clear(WHITE);
 	lcd_update_status("collecting data");
 
-  tim6_start(); // start timer 6 to display time to screen
-  tim7_start(); // starting timer 7 begins IMU data collection
+	tim6_start(); // start timer 6 to display time to screen
+	tim7_start(); // starting timer 7 begins IMU data collection
 	
 	EXTI->PR |= EXTI_PR_PR0;
 }
 
 void EXTI2_3_IRQHandler(void) { // TODO: copy this over to keypad based interrupt where mode = st
 	tim6_stop(); // start timer 6 to display time to screen
-  tim7_stop(); // starting timer 7 begins IMU data collection
+	tim7_stop(); // starting timer 7 begins IMU data collection
 
-	lcd_update_status("finished collecting data");
-
+	lcd_update_status("finished");
 	EXTI->PR |= EXTI_PR_PR2;
 }
 
