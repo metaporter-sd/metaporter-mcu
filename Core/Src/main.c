@@ -18,12 +18,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "uart.h"
 #include "utilities.h"
 #include "timers.h"
-//#include "lcd.h"
-//#include "keypad.h"
+#include "uart.h"
 #include "dma.h"
+#include "lcd.h"
 #include "imu.h"
 #include <stdio.h>
 
@@ -50,12 +49,18 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-int time_remaining = 0;
+int time_elapsed = 0;
+
+IMU imu;
+
+char dma_test[8] = "hello\n\r"; // to test dma
+
+// to make sure dma transfer is complete before new reading
 int count = 0;
 int dma_transfers_started = 0;
 int dma_transfers_completed = 0;
-char dma_test[8] = "hello\n\r";
-IMU imu;
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -97,23 +102,13 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
+  keypad_init();
   uart3_init();
-
-  nano_wait(1000000000);
-
-  imu_init(&imu, IMU_ADDR, IMU_MODE_NDOF);
   dma1_init();
+  nano_wait(1000000000);
+  imu_init(&imu, IMU_ADDR, IMU_MODE_NDOF);
+  tim6_init();
   tim7_init();
-  tim7_start();						// enable timer 7 clock
-
-  imu_get_quat(&imu);
-
-//  imu_test(&imu);
-
-  //LCD_Setup();
-  //Keypad_Init();
-
-  //uart3_test();
 
   /* USER CODE END 2 */
 
@@ -171,53 +166,65 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-//void DMA1_Ch4_7_DMA2_Ch3_5_IRQHandler(void) {
-//	if ( DMA1->ISR && DMA_ISR_TCIF7 ) {
-//		DMA1->IFCR |= DMA_IFCR_CTCIF7;
-//		dma_transfers_completed++;
-//	}
-//}
+// Interrupt Service Routines 
+
+void EXTI0_1_IRQHandler(void) { // TODO: copy this over to keypad based interrupt where status = data_col
+	time_elapsed = 0; 
+	lcd_update_status("collecting data");
+
+  tim6_start(); // start timer 6 to display time to screen
+  tim7_start(); // starting timer 7 begins IMU data collection
+	
+	EXTI->PR |= EXTI_PR_PR0;
+}
+
+void EXTI2_3_IRQHandler(void) { // TODO: copy this over to keypad based interrupt where mode = st
+	tim6_stop(); // start timer 6 to display time to screen
+  tim7_stop(); // starting timer 7 begins IMU data collection
+
+	lcd_update_status("finished collecting data");
+
+	EXTI->PR |= EXTI_PR_PR2;
+}
+
+void TIM6_DAC_IRQHandler(void) {
+	char stringy[100];
+  TIM6->SR &= ~TIM_SR_UIF;
+
+	time_elapsed += 1;
+	//sprintf(stringy, "MetaPorter has been capturing data for: %ds", time_elapsed);
+	LCD_DrawString(0, 240, BLACK, WHITE, ("Metaporter has been capturing"), 16, 0);
+	sprintf(stringy, "data for: %ds", time_elapsed); //convert int time into string
+	LCD_DrawString(0, 275, BLACK, WHITE,  (stringy), 16, 0);
+}
 
 void TIM7_IRQHandler(void) {
 //	DMA1->IFCR |= DMA_IFCR_CGIF7;
-	// int timeout = 8000; // times out after 5ms
+// int timeout = 8000; // times out after 5ms
 
 	if ( count < 50 ) {
-
 //		for (int i = 0; i < timeout; i++) {
 //			if (dma_transfers_started == dma_transfers_completed) {
 //				break;
 //			}
 //			nano_wait(1000);
 //		}
-
 		imu_get_quat(&imu);
 
 		char data_string[100];
 		// send data as string
 		sprintf(data_string, "(%d, %d, %d, %d)\n\r", imu.quat[0], imu.quat[1], imu.quat[2], imu.quat[3]);
-
 		dma1_start(data_string, (uint32_t) &(USART3->TDR), strlen(data_string));
 
-
-//		dma1_start(imu.quat, &(USART3->TDR), sizeof(imu.quat));	// sends imu data as bytes
-		//dma_transfers_started++;
+    // dma1_start(imu.quat, &(USART3->TDR), sizeof(imu.quat));	// sends imu data as bytes
+		
+    // dma_transfers_started++;
 	}
 	count++;
 
 	TIM7->SR &= ~TIM_SR_UIF;
 }
 
-//void EXTI2_3_IRQHandler(void) {
-//	char data_string[64];
-//
-//	imu_get_quat(&imu);
-//	// send data as string
-//	sprintf(data_string, "(%d, %d, %d, %d)\n\r", imu.x, imu.y, imu.z, imu.w);
-//	uart3_send_string(data_string);
-//
-//	EXTI->PR |= EXTI_PR_PR2;
-//}
 
 //void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 //{
@@ -236,16 +243,13 @@ void TIM7_IRQHandler(void) {
 //
 //}
 //
-//void TIM6_DAC_IRQHandler(void) {
-//	char stringy[20];
-//    TIM6->SR &= ~TIM_SR_UIF;
-//    time_remaining+=1;
-//    sprintf(stringy, "Time: %ds", time_remaining);
-//    //sprintf(score_string, "Level: %d", level_score);
-//    LCD_DrawString(80, 145, BLACK, WHITE,  (stringy), 16, 0);
-//
-//    spi2_display2(stringy);
+//void DMA1_Ch4_7_DMA2_Ch3_5_IRQHandler(void) {
+//	if ( DMA1->ISR && DMA_ISR_TCIF7 ) {
+//		DMA1->IFCR |= DMA_IFCR_CTCIF7;
+//		dma_transfers_completed++;
+//	}
 //}
+
 
 /* USER CODE END 4 */
 
