@@ -193,9 +193,9 @@ void TIM6_DAC_IRQHandler(void) {
 
 	time_elapsed += 1;
 	//sprintf(stringy, "MetaPorter has been capturing data for: %ds", time_elapsed);
-	LCD_DrawString(0, 240, BLACK, WHITE, ("Metaporter has been capturing"), 16, 0);
+	lcd_draw_string(0, 240, BLACK, WHITE, ("Metaporter has been capturing"), 16, 0);
 	sprintf(stringy, "data for: %ds", time_elapsed); //convert int time into string
-	LCD_DrawString(0, 275, BLACK, WHITE,  (stringy), 16, 0);
+	lcd_draw_string(0, 275, BLACK, WHITE,  (stringy), 16, 0);
 }
 
 void TIM7_IRQHandler(void) {

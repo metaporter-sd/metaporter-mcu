@@ -71,37 +71,11 @@ extern lcd_dev_t lcddev;
 
 
 
-void LCD_Setup(void);
-void LCD_Init(void (*reset)(int), void (*select)(int), void (*reg_select)(int));
-void LCD_Clear(u16 Color);
-void LCD_DrawPoint(u16 x,u16 y,u16 c);
-void LCD_DrawLine(u16 x1, u16 y1, u16 x2, u16 y2, u16 c);
-void LCD_DrawRectangle(u16 x1, u16 y1, u16 x2, u16 y2, u16 c);
-void LCD_DrawFillRectangle(u16 x1, u16 y1, u16 x2, u16 y2, u16 c);
-void LCD_Circle(u16 xc, u16 yc, u16 r, u16 fill, u16 c);
-void LCD_DrawTriangle(u16 x0,u16 y0, u16 x1,u16 y1, u16 x2,u16 y2, u16 c);
-void LCD_DrawFillTriangle(u16 x0,u16 y0, u16 x1,u16 y1, u16 x2,u16 y2, u16 c);
-void LCD_DrawChar(u16 x,u16 y,u16 fc, u16 bc, char num, u8 size, u8 mode);
-void LCD_DrawString(u16 x,u16 y, u16 fc, u16 bg, const char *p, u8 size, u8 mode);
-
-void init_spi2(void);
-void spi2_init_oled(void);
-void spi2_display1(const char *string);
-void spi2_display2(const char *string);
-
-//===========================================================================
-// C Picture data structure.
-//===========================================================================
-typedef struct {
-    unsigned int   width;
-    unsigned int   height;
-    unsigned int   bytes_per_pixel; // 2:RGB16, 3:RGB, 4:RGBA
-    union {
-    unsigned char  pixel_data[0]; // variable length array
-    unsigned short pix2[0];
-    };
-} Picture;
-
-void LCD_DrawPicture(int x0, int y0, const Picture *pic);
+void lcd_setup(void);
+void lcd_init(void (*reset)(int), void (*select)(int), void (*reg_select)(int));
+void lcd_clear(u16 Color);
+void lcd_drawChar(u16 x,u16 y,u16 fc, u16 bc, char num, u8 size, u8 mode);
+void lcd_drawString(u16 x,u16 y, u16 fc, u16 bg, const char *p, u8 size, u8 mode);
+void lcd_update_status(char * status);
 
 #endif
