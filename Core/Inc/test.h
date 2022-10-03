@@ -23,8 +23,6 @@ extern "C" {
 void init_exti_pa0(void);
 void init_exti_pb2(void);
 
-
-
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
 

@@ -22,7 +22,6 @@ extern "C" {
 
 void nano_wait(unsigned int n);
 
-
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
 

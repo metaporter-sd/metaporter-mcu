@@ -21,9 +21,7 @@ extern "C" {
 #include "stm32f0xx_hal.h"
 
 void dma1_init(void);
-
 void dma1_start(void * src, uint32_t dst, uint16_t num_bytes);
-
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
