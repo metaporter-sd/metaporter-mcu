@@ -39,7 +39,7 @@ static const char KeyPadMatrix[KEYPAD_ROW_SIZE][KEYPAD_COL_SIZE] = {
 void keypad_init(void);
 void set_row(char offset);
 int get_cols(void);
-void get_key(char offset, int cols);
+char get_key(char offset, int cols);
 
 
 /* Private defines -----------------------------------------------------------*/

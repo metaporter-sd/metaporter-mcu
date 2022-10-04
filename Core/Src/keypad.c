@@ -106,7 +106,6 @@ char get_key(char offset, int cols) {
     }
 
     return key_pressed;
-
 }
 
 /* USER CODE END 4 */
