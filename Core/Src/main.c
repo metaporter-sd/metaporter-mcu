@@ -180,6 +180,12 @@ void EXTI0_1_IRQHandler(void) { // TODO: copy this over to keypad based interrup
 	lcd_clear(WHITE);
 	lcd_update_status("collecting data");
 
+	char stringy[100];
+	lcd_draw_string(0, 240, BLACK, WHITE, ("Metaporter has been capturing"), 16, 0);
+	sprintf(stringy, "data for: %ds", time_elapsed); //convert int time into string
+	lcd_draw_string(0, 275, BLACK, WHITE,  (stringy), 16, 0);
+
+	count = 0;
 	tim6_start(); // start timer 6 to display time to screen
 	tim7_start(); // starting timer 7 begins IMU data collection
 	
@@ -195,38 +201,39 @@ void EXTI2_3_IRQHandler(void) { // TODO: copy this over to keypad based interrup
 }
 
 void TIM6_DAC_IRQHandler(void) {
-	char stringy[100];
+	
   TIM6->SR &= ~TIM_SR_UIF;
-
-	time_elapsed += 1;
-	//sprintf(stringy, "MetaPorter has been capturing data for: %ds", time_elapsed);
-	lcd_draw_string(0, 240, BLACK, WHITE, ("Metaporter has been capturing"), 16, 0);
-	sprintf(stringy, "data for: %ds", time_elapsed); //convert int time into string
-	lcd_draw_string(0, 275, BLACK, WHITE,  (stringy), 16, 0);
 }
 
 void TIM7_IRQHandler(void) { // TODO: discard last few readings
 //	DMA1->IFCR |= DMA_IFCR_CGIF7;
 // int timeout = 8000; // times out after 5ms
+    char stringy[100];
+    if (count >= 100) { // every 1 second update display with time elapsed
+  	    time_elapsed += 1;
+  	    //sprintf(stringy, "MetaPorter has been capturing data for: %ds", time_elapsed);
+  	    lcd_draw_string(0, 240, BLACK, WHITE, ("Metaporter has been capturing"), 16, 0);
+   	    sprintf(stringy, "data for: %ds", time_elapsed); //convert int time into string
+  	    lcd_draw_string(0, 275, BLACK, WHITE,  (stringy), 16, 0);
+        count = 0;
+    }
 
-	if ( count < 10000 ) {
 //		for (int i = 0; i < timeout; i++) {
 //			if (dma_transfers_started == dma_transfers_completed) {
 //				break;
 //			}
 //			nano_wait(1000);
 //		}
-		imu_get_quat(&imu);
+    imu_get_quat(&imu);
 
-		char data_string[100];
-		// send data as string
-		sprintf(data_string, "(%d, %d, %d, %d)\n\r", imu.quat[0], imu.quat[1], imu.quat[2], imu.quat[3]);
-		dma1_start(data_string, (uint32_t) &(USART3->TDR), strlen(data_string));
+    char data_string[100];
+	// send data as string
+    sprintf(data_string, "(%d, %d, %d, %d)\n\r", imu.quat[0], imu.quat[1], imu.quat[2], imu.quat[3]);
+    dma1_start(data_string, (uint32_t) &(USART3->TDR), strlen(data_string));
 
-    // dma1_start(imu.quat, &(USART3->TDR), sizeof(imu.quat));	// sends imu data as bytes
-		
-    // dma_transfers_started++;
-	}
+  // dma1_start(imu.quat, &(USART3->TDR), sizeof(imu.quat));	// sends imu data as bytes
+  // dma_transfers_started++;
+
 	count++;
 
 	TIM7->SR &= ~TIM_SR_UIF;
