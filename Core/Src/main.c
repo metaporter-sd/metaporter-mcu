@@ -177,9 +177,9 @@ void TIM6_DAC_IRQHandler(void) {
     TIM6->SR &= ~TIM_SR_UIF;
 
     // set mode based on key pressed
-    if (key_pressed = MODE_DATA_COL) {
+    if (key_pressed == MODE_DATA_COL) {
         start_data_collection();
-    } else if (key_pressed = MODE_STOP_DATA_COL) {
+    } else if (key_pressed == MODE_STOP_DATA_COL) {
     	stop_data_collection();
     }
 }
