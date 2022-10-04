@@ -41,7 +41,8 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
+#define MODE_DATA_COL '1'
+#define MODE_STOP_DATA_COL '2'
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -53,7 +54,8 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void start_data_collection(void);
+void stop_data_collection(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

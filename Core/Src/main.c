@@ -52,7 +52,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-char offset; // used to scan keys
+char offset = 0; // used to scan keys
 
 int time_elapsed = 0;
 
@@ -113,10 +113,12 @@ int main(void)
   imu_init(&imu, IMU_ADDR, IMU_MODE_NDOF);
   tim6_init();
   tim7_init();
+  keypad_init();
 
+  tim6_start(); // start timer 6 to scan keypad rows
 
-  init_exti_pa0(); // for testing
-  init_exti_pb2(); // for testing
+  //init_exti_pa0(); // for testing
+  //init_exti_pb2(); // for testing
 
   /* USER CODE END 2 */
 
@@ -124,18 +126,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-//	  	char data_string[64];
-//
-//		imu_get_quat(&imu);
-//		// send data as string
-//		sprintf(data_string, "(%d, %d, %d, %d)\n\r", imu.x, imu.y, imu.z, imu.w);
-//		uart3_send_string(data_string);
-//		nano_wait(100000000);
 
-    /* USER CODE BEGIN 3 */
   }
-  /* USER CODE END 3 */
+	  /* USER CODE BEGIN 3 */
+	  /* USER CODE END 3 */
 }
 
 /**
@@ -175,35 +169,19 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 // Interrupt Service Routines 
-
-void EXTI0_1_IRQHandler(void) { // TODO: copy this over to keypad based interrupt where status = data_col
-	time_elapsed = 0; 
-	lcd_clear(WHITE);
-	lcd_update_status("collecting data");
-
-	char stringy[100];
-	lcd_draw_string(0, 240, BLACK, WHITE, ("Metaporter has been capturing"), 16, 0);
-	sprintf(stringy, "data for: %ds", time_elapsed); //convert int time into string
-	lcd_draw_string(0, 275, BLACK, WHITE,  (stringy), 16, 0);
-
-	count = 0;
-	tim6_start(); // start timer 6 to display time to screen
-	tim7_start(); // starting timer 7 begins IMU data collection
-	
-	EXTI->PR |= EXTI_PR_PR0;
-}
-
-void EXTI2_3_IRQHandler(void) { // TODO: copy this over to keypad based interrupt where mode = st
-	tim6_stop(); // start timer 6 to display time to screen
-	tim7_stop(); // starting timer 7 begins IMU data collection
-
-	lcd_update_status("finished");
-	EXTI->PR |= EXTI_PR_PR2;
-}
-
 void TIM6_DAC_IRQHandler(void) {
-	
-  TIM6->SR &= ~TIM_SR_UIF;
+    int cols = get_cols();
+    char key_pressed = get_key(offset, cols);
+    offset = (offset + 1) & 0x7; // count 0 ... 7 and repeat
+    set_row(offset);
+    TIM6->SR &= ~TIM_SR_UIF;
+
+    // set mode based on key pressed
+    if (key_pressed = MODE_DATA_COL) {
+        start_data_collection();
+    } else if (key_pressed = MODE_STOP_DATA_COL) {
+    	stop_data_collection();
+    }
 }
 
 void TIM7_IRQHandler(void) { // TODO: discard last few readings
@@ -241,31 +219,28 @@ void TIM7_IRQHandler(void) { // TODO: discard last few readings
 }
 
 
-//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-//{
-//	if(GPIO_Pin == GPIO_PIN_8){
-//		char buttonVal;
-//		if(Keypad_Scan(&buttonVal))
-//		{
-//			uart3_send_byte(buttonVal);
-//		}
-//	}
-//}
-//
-//void EXTI4_15_IRQHandler(void)
-//{
-//	HAL_GPIO_EXTI_Callback(GPIO_PIN_8);
-//
-//}
-//
-//void DMA1_Ch4_7_DMA2_Ch3_5_IRQHandler(void) {
-//	if ( DMA1->ISR && DMA_ISR_TCIF7 ) {
-//		DMA1->IFCR |= DMA_IFCR_CTCIF7;
-//		dma_transfers_completed++;
-//	}
-//}
+void start_data_collection(void) { // TODO: copy this over to keypad based interrupt where status = data_col
+	time_elapsed = 0;
+	lcd_clear(WHITE);
+	lcd_update_status("collecting data");
 
+	char stringy[100];
+	lcd_draw_string(0, 240, BLACK, WHITE, ("Metaporter has been capturing"), 16, 0);
+	sprintf(stringy, "data for: %ds", time_elapsed); //convert int time into string
+	lcd_draw_string(0, 275, BLACK, WHITE,  (stringy), 16, 0);
 
+	count = 0;
+	tim7_start(); // starting timer 7 begins IMU data collection
+
+	EXTI->PR |= EXTI_PR_PR0;
+}
+
+void stop_data_collection (void) { // TODO: copy this over to keypad based interrupt where mode = st
+	tim7_stop(); // starting timer 7 begins IMU data collection
+
+	lcd_update_status("finished");
+	EXTI->PR |= EXTI_PR_PR2;
+}
 /* USER CODE END 4 */
 
 /**

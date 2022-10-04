@@ -24,6 +24,7 @@ extern "C" {
 #define KEYPAD_ROW_SIZE 4			// number of rows
 #define KEYPAD_COL_SIZE 4			// number of columns
 
+#define ESCAPE_KEY 'z'
 
 // The keypad matrix mapping
 static const char KeyPadMatrix[KEYPAD_ROW_SIZE][KEYPAD_COL_SIZE] = {
@@ -38,7 +39,7 @@ static const char KeyPadMatrix[KEYPAD_ROW_SIZE][KEYPAD_COL_SIZE] = {
 void keypad_init(void);
 void set_row(char offset);
 int get_cols(void);
-void update_state(char offset, int cols);
+void get_key(char offset, int cols);
 
 
 /* Private defines -----------------------------------------------------------*/

@@ -20,7 +20,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "new_keypad.h"
+#include "keypad.h"
 #include "uart.h"
 #include "utilities.h"
 /* USER CODE END Includes */
@@ -94,9 +94,9 @@ int get_cols(void) {
 
 // Check the columns for a row of the keypad and update state.
 // If a col is updated to 0x01, update state.
-void update_state(char offset, int cols) {
+char get_key(char offset, int cols) {
     int row = offset & 3;
-    char key_pressed = 'z';
+    char key_pressed = ESCAPE_KEY;
     for(int i=0; i < 4; i++) {
         history[4*row+i] = (history[4*row+i]<<1) + ((cols>>i)&1);
         if (history[4*row+i] == 0x1) {
@@ -104,21 +104,10 @@ void update_state(char offset, int cols) {
         	key_pressed = KeyPadMatrix[row][i];
         }
     }
-    if(key_pressed != 'z') {
-		uart3_send_byte(key_pressed);
-	}
+
+    return key_pressed;
 
 }
-
-
-void TIM6_DAC_IRQHandler(void) {
-    int cols = get_cols();
-    update_hist(cols);
-    offset = (offset + 1) & 0x7; // count 0 ... 7 and repeat
-    set_row();
-    TIM6->SR &= ~TIM_SR_UIF;
-}
-
 
 /* USER CODE END 4 */
 
