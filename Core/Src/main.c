@@ -205,11 +205,11 @@ void TIM6_DAC_IRQHandler(void) {
 	lcd_draw_string(0, 275, BLACK, WHITE,  (stringy), 16, 0);
 }
 
-void TIM7_IRQHandler(void) {
+void TIM7_IRQHandler(void) { // TODO: discard last few readings
 //	DMA1->IFCR |= DMA_IFCR_CGIF7;
 // int timeout = 8000; // times out after 5ms
 
-	if ( count < 50 ) {
+	if ( count < 10000 ) {
 //		for (int i = 0; i < timeout; i++) {
 //			if (dma_transfers_started == dma_transfers_completed) {
 //				break;

@@ -18,12 +18,12 @@ lcd_dev_t lcddev;
 #define CS_LOW do { GPIOB->BSRR = GPIO_BSRR_BR_8; } while(0)
 #define RESET_NUM 11
 #define RESET_BIT (1<<RESET_NUM)
-#define RESET_HIGH do { GPIOB->BSRR = GPIO_BSRR_BS_11; } while(0)
-#define RESET_LOW  do { GPIOB->BSRR = GPIO_BSRR_BR_11; } while(0)
+#define RESET_HIGH do { GPIOB->BSRR = GPIO_BSRR_BS_9; } while(0)
+#define RESET_LOW  do { GPIOB->BSRR = GPIO_BSRR_BR_9; } while(0)
 #define DC_NUM 14
 #define DC_BIT (1<<DC_NUM)
-#define DC_HIGH do { GPIOB->BSRR = GPIO_BSRR_BS_14; } while(0)
-#define DC_LOW  do { GPIOB->BSRR = GPIO_BSRR_BR_14; } while(0)
+#define DC_HIGH do { GPIOD->BSRR = GPIO_BSRR_BS_2; } while(0)
+#define DC_LOW  do { GPIOD->BSRR = GPIO_BSRR_BR_2; } while(0)
 
 // Set the CS pin low if val is non-zero.
 // Note that when CS is being set high again, wait on SPI to not be busy.
@@ -273,14 +273,21 @@ void lcd_init(void (*reset)(int), void (*select)(int), void (*reg_select)(int))
     lcddev.select(0);
 }
 
-void init_spi1(void)
+void init_spi1(void) // changes: 11->9; pd14 -> pd2 or pb4
 {
     RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
-    GPIOB->MODER &= ~(GPIO_MODER_MODER8 | GPIO_MODER_MODER11 | GPIO_MODER_MODER14);
-    GPIOB->MODER |= GPIO_MODER_MODER8_0 | GPIO_MODER_MODER11_0 | GPIO_MODER_MODER14_0;
-    GPIOB->ODR |= GPIO_ODR_8 | GPIO_ODR_11 | GPIO_ODR_14;
+    GPIOB->MODER &= ~(GPIO_MODER_MODER8 | GPIO_MODER_MODER9);
+    GPIOB->MODER |= GPIO_MODER_MODER8_0 | GPIO_MODER_MODER9_0 ;
+    GPIOB->ODR |= GPIO_ODR_8 | GPIO_ODR_9 | GPIO_ODR_14;
+
     GPIOB->MODER |= GPIO_MODER_MODER3 | GPIO_MODER_MODER5;
     GPIOB->MODER &= ~(GPIO_MODER_MODER3_0 | GPIO_MODER_MODER5_0);
+
+    RCC->AHBENR |= RCC_AHBENR_GPIODEN;
+    GPIOD->MODER &= ~GPIO_MODER_MODER2;
+    GPIOD->MODER |= GPIO_MODER_MODER2_0 ;
+
+
 
     RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
     SPI1->CR1 &= ~SPI_CR1_SPE;
