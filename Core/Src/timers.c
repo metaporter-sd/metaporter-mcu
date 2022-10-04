@@ -62,8 +62,8 @@
 void tim6_init(void) {
   TIM6->CR1 &= ~TIM_CR1_CEN;
   RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
-  TIM6->PSC = 48000-1;
-  TIM6->ARR = 1000-1;
+  TIM6->PSC = 4800-1;
+  TIM6->ARR = 10-1;
   TIM6->DIER |= TIM_DIER_UIE;
   NVIC->ISER[0] = 1<<TIM6_DAC_IRQn;
 }

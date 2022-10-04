@@ -22,6 +22,7 @@
 #include "main.h"
 #include "utilities.h"
 #include "timers.h"
+#include "keypad.h"
 #include "uart.h"
 #include "dma.h"
 #include "lcd.h"
@@ -51,11 +52,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+char offset; // used to scan keys
+
 int time_elapsed = 0;
 
 IMU imu;
-
-char dma_test[8] = "hello\n\r"; // to test dma
 
 // to make sure dma transfer is complete before new reading
 int count = 0;
