@@ -41,7 +41,7 @@ extern lcd_dev_t lcddev;
 // 3: rotate 270
 
 
-#define USE_HORIZONTAL       0
+#define USE_HORIZONTAL       1
 
 // The dimensions of the display.
 #define LCD_W 240
@@ -76,6 +76,10 @@ void lcd_init(void (*reset)(int), void (*select)(int), void (*reg_select)(int));
 void lcd_clear(u16 Color);
 void lcd_draw_char(u16 x,u16 y,u16 fc, u16 bc, char num, u8 size, u8 mode);
 void lcd_draw_string(u16 x,u16 y, u16 fc, u16 bg, const char *p, u8 size, u8 mode);
+
+void lcd_set_home_screen();
 void lcd_update_status(char * status);
+void lcd_show_elapsed_time(int time_elapsed);
+
 
 #endif

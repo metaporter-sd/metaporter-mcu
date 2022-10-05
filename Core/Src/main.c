@@ -108,7 +108,11 @@ int main(void)
   //keypad_init();
   uart3_init();
   dma1_init();
+
   lcd_setup();
+  lcd_set_home_screen();
+
+
   nano_wait(1000000000);
   imu_init(&imu, IMU_ADDR, IMU_MODE_NDOF);
   tim6_init();
@@ -174,7 +178,7 @@ void TIM6_DAC_IRQHandler(void) {
     char key_pressed = get_key(offset, cols);
     offset = (offset + 1) & 0x7; // count 0 ... 7 and repeat
     set_row(offset);
-    TIM6->SR &= ~TIM_SR_UIF;
+
 
     // set mode based on key pressed
     if (key_pressed == MODE_DATA_COL) {
@@ -182,18 +186,15 @@ void TIM6_DAC_IRQHandler(void) {
     } else if (key_pressed == MODE_STOP_DATA_COL) {
     	stop_data_collection();
     }
+    TIM6->SR &= ~TIM_SR_UIF;
 }
 
 void TIM7_IRQHandler(void) { // TODO: discard last few readings
 //	DMA1->IFCR |= DMA_IFCR_CGIF7;
 // int timeout = 8000; // times out after 5ms
-    char stringy[100];
     if (count >= 100) { // every 1 second update display with time elapsed
   	    time_elapsed += 1;
-  	    //sprintf(stringy, "MetaPorter has been capturing data for: %ds", time_elapsed);
-  	    lcd_draw_string(0, 240, BLACK, WHITE, ("Metaporter has been capturing"), 16, 0);
-   	    sprintf(stringy, "data for: %ds", time_elapsed); //convert int time into string
-  	    lcd_draw_string(0, 275, BLACK, WHITE,  (stringy), 16, 0);
+  	    lcd_show_elapsed_time(time_elapsed);
         count = 0;
     }
 
@@ -221,14 +222,9 @@ void TIM7_IRQHandler(void) { // TODO: discard last few readings
 
 void start_data_collection(void) { // TODO: copy this over to keypad based interrupt where status = data_col
 	time_elapsed = 0;
-	lcd_clear(WHITE);
-	lcd_update_status("collecting data");
-
-	char stringy[100];
-	lcd_draw_string(0, 240, BLACK, WHITE, ("Metaporter has been capturing"), 16, 0);
-	sprintf(stringy, "data for: %ds", time_elapsed); //convert int time into string
-	lcd_draw_string(0, 275, BLACK, WHITE,  (stringy), 16, 0);
-
+	//lcd_clear(WHITE);
+	lcd_update_status("Collecting Data");
+	lcd_show_elapsed_time(time_elapsed);
 	count = 0;
 	tim7_start(); // starting timer 7 begins IMU data collection
 
@@ -237,8 +233,8 @@ void start_data_collection(void) { // TODO: copy this over to keypad based inter
 
 void stop_data_collection (void) { // TODO: copy this over to keypad based interrupt where mode = st
 	tim7_stop(); // starting timer 7 begins IMU data collection
-
-	lcd_update_status("finished");
+	lcd_set_home_screen();
+	lcd_update_status("Finished");
 	EXTI->PR |= EXTI_PR_PR2;
 }
 /* USER CODE END 4 */
