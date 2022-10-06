@@ -244,11 +244,18 @@ void start_data_collection(void) {
 	lcd_set_home_screen();
 	lcd_update_status("Collecting Data");
 	lcd_show_elapsed_time(time_elapsed);
+	uart3_send_byte(0xFF);					// send start cmd
+	uart3_send_byte(0x0);
+	uart3_send_byte(0xFF);
+	uart3_send_byte(0x0);
 	tim7_start(); // starting timer 7 begins IMU data collection
 }
 
-void stop_data_collection (void) { //
-
+void stop_data_collection (void) {
+	uart3_send_byte(0x0);	// send stop cmd
+	uart3_send_byte(0xFF);
+	uart3_send_byte(0x0);
+	uart3_send_byte(0xFF);
 	tim7_stop(); // starting timer 7 begins IMU data collection
 	//while (dma_transfers_started >= dma_transfers_completed);
 //	char data_string[100];
