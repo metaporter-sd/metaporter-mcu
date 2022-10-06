@@ -183,29 +183,31 @@ void TIM6_DAC_IRQHandler(void) {
 
     // set mode based on key pressed
     if (key_pressed == MODE_DATA_COL) {
-        start_data_collection();
+        start_data_collection(); // start to start is safe
     } else if (key_pressed == MODE_STOP_DATA_COL) {
     	stop_data_collection();
     } else if (key_pressed == MODE_CALIBRATE) {
+    	// start to calibrate needs to stop tim7 which is done inside calibrate...safe
     	dummy_calibrate();
     }
 }
 
 void TIM7_IRQHandler(void) { // TODO: discard last few readings
 //	DMA1->IFCR |= DMA_IFCR_CGIF7;
-// int timeout = 8000; // times out after 5ms
     if (count >= 100) { // every 1 second update display with time elapsed
   	    time_elapsed += 1;
   	    lcd_show_elapsed_time(time_elapsed);
         count = 0;
     }
 
-//		for (int i = 0; i < timeout; i++) {
-//			if (dma_transfers_started == dma_transfers_completed) {
-//				break;
-//			}
-//			nano_wait(1000);
-//		}
+
+    int timeout = 70; // max 100, 50 = timeout after 5ms
+    for (int i = 0; i < timeout; i++) {
+		if (dma_transfers_started == dma_transfers_completed) {
+				break;
+		}
+		nano_wait(100000); // 10 ms = 10^7 ns,
+	}
     imu_get_quat(&imu);
 
     char data_string[100];
@@ -217,33 +219,31 @@ void TIM7_IRQHandler(void) { // TODO: discard last few readings
   // dma_transfers_started++;
 
 	count++;
-
 	TIM7->SR &= ~TIM_SR_UIF;
 }
 
 
-void start_data_collection(void) { // TODO: copy this over to keypad based interrupt where status = data_col
+void start_data_collection(void) {
+	count = 0;
 	time_elapsed = 0;
-	//lcd_clear(WHITE);
 	lcd_set_home_screen();
 	lcd_update_status("Collecting Data");
 	lcd_show_elapsed_time(time_elapsed);
-	count = 0;
 	tim7_start(); // starting timer 7 begins IMU data collection
-
-	//EXTI->PR |= EXTI_PR_PR0;
 }
 
-void stop_data_collection (void) { // TODO: copy this over to keypad based interrupt where mode = st
+void stop_data_collection (void) { //
 	tim7_stop(); // starting timer 7 begins IMU data collection
 	lcd_set_home_screen();
 	lcd_update_status("Finished");
-	//EXTI->PR |= EXTI_PR_PR2;
 }
 
 void dummy_calibrate (void) {
+	tim7_stop(); // starting timer 7 begins IMU data collection
 	lcd_set_home_screen();
 	lcd_update_status("Calibrating");
+
+	// TODO: add actual calibration
 	for (int i = 0; i < 5; i++) {
 		nano_wait(1000000000);
 	}
