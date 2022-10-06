@@ -192,8 +192,14 @@ void TIM6_DAC_IRQHandler(void) {
     }
 }
 
+void DMA1_Ch4_7_DMA2_Ch3_5_IRQHandler(void) {
+	if ( DMA1->ISR && DMA_ISR_TCIF7 ) {
+		dma_transfers_completed++;
+		DMA1->IFCR |= DMA_IFCR_CTCIF7;
+	}
+}
+
 void TIM7_IRQHandler(void) { // TODO: discard last few readings
-//	DMA1->IFCR |= DMA_IFCR_CGIF7;
     if (count >= 100) { // every 1 second update display with time elapsed
   	    time_elapsed += 1;
   	    lcd_show_elapsed_time(time_elapsed);
@@ -201,14 +207,22 @@ void TIM7_IRQHandler(void) { // TODO: discard last few readings
     }
 
 
-    int timeout = 70; // max 100, 50 = timeout after 5ms
+    int timeout = 7; // max 10, 5 = timeout after 5ms
     for (int i = 0; i < timeout; i++) {
 		if (dma_transfers_started == dma_transfers_completed) {
-				break;
-		}
-		nano_wait(100000); // 10 ms = 10^7 ns,
+			break;
+		} //else {
+			//char data_string[100];
+			//sprintf(data_string, "started: %d, finished: %d\n\r", dma_transfers_started, dma_transfers_completed);
+			//uart3_send_string(data_string);
+			//tim7_stop();
+			//break;
+					}
+		nano_wait(1000000); // 10 ms = 10^7 ns,
 	}
+
     imu_get_quat(&imu);
+    count++;
 
     char data_string[100];
 	// send data as string
@@ -216,15 +230,16 @@ void TIM7_IRQHandler(void) { // TODO: discard last few readings
     dma1_start(data_string, (uint32_t) &(USART3->TDR), strlen(data_string));
 
   // dma1_start(imu.quat, &(USART3->TDR), sizeof(imu.quat));	// sends imu data as bytes
-  // dma_transfers_started++;
+    dma_transfers_started++;
 
-	count++;
 	TIM7->SR &= ~TIM_SR_UIF;
 }
 
 
 void start_data_collection(void) {
 	count = 0;
+	dma_transfers_started = 0;
+	dma_transfers_completed = 0;
 	time_elapsed = 0;
 	lcd_set_home_screen();
 	lcd_update_status("Collecting Data");
@@ -233,7 +248,18 @@ void start_data_collection(void) {
 }
 
 void stop_data_collection (void) { //
+
 	tim7_stop(); // starting timer 7 begins IMU data collection
+	//while (dma_transfers_started >= dma_transfers_completed);
+//	char data_string[100];
+//	sprintf(data_string, "started: %d, finished: %d\n\r", dma_transfers_started, dma_transfers_completed);
+//	uart3_send_string(data_string);
+
+	// wait for last transfer to finish before moving on
+//	while (dma_transfers_started != dma_transfers_completed) {
+//		nano_wait(100000); // 10 ms = 10^7 ns,
+//	}
+
 	lcd_set_home_screen();
 	lcd_update_status("Finished");
 }

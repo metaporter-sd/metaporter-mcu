@@ -68,8 +68,8 @@ void dma1_init(void) {
     DMA1_Channel7->CCR &= ~(DMA_CCR_PSIZE);				// 00: 8 bits
     DMA1_Channel7->CCR &= ~(DMA_CCR_MSIZE);				// 00: 8 bits
 //    DMA1_Channel7->CCR |= DMA_CCR_CIRC;					// Enable circular buffer
-//    DMA1_Channel7->CCR |= DMA_CCR_TCIE;					// Enable transfer complete interrupt
-//    NVIC->ISER[0] = 1<<DMA1_Channel4_5_6_7_IRQn;		// Enable the interrupt
+    DMA1_Channel7->CCR |= DMA_CCR_TCIE;					// Enable transfer complete interrupt
+    NVIC->ISER[0] = 1<<DMA1_Channel4_5_6_7_IRQn;		// Enable the interrupt
 
 }
 
