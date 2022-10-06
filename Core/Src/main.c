@@ -179,14 +179,16 @@ void TIM6_DAC_IRQHandler(void) {
     offset = (offset + 1) & 0x7; // count 0 ... 7 and repeat
     set_row(offset);
 
+    TIM6->SR &= ~TIM_SR_UIF; // clear interrupt
 
     // set mode based on key pressed
     if (key_pressed == MODE_DATA_COL) {
         start_data_collection();
     } else if (key_pressed == MODE_STOP_DATA_COL) {
     	stop_data_collection();
+    } else if (key_pressed == MODE_CALIBRATE) {
+    	dummy_calibrate();
     }
-    TIM6->SR &= ~TIM_SR_UIF;
 }
 
 void TIM7_IRQHandler(void) { // TODO: discard last few readings
@@ -223,19 +225,31 @@ void TIM7_IRQHandler(void) { // TODO: discard last few readings
 void start_data_collection(void) { // TODO: copy this over to keypad based interrupt where status = data_col
 	time_elapsed = 0;
 	//lcd_clear(WHITE);
+	lcd_set_home_screen();
 	lcd_update_status("Collecting Data");
 	lcd_show_elapsed_time(time_elapsed);
 	count = 0;
 	tim7_start(); // starting timer 7 begins IMU data collection
 
-	EXTI->PR |= EXTI_PR_PR0;
+	//EXTI->PR |= EXTI_PR_PR0;
 }
 
 void stop_data_collection (void) { // TODO: copy this over to keypad based interrupt where mode = st
 	tim7_stop(); // starting timer 7 begins IMU data collection
 	lcd_set_home_screen();
 	lcd_update_status("Finished");
-	EXTI->PR |= EXTI_PR_PR2;
+	//EXTI->PR |= EXTI_PR_PR2;
+}
+
+void dummy_calibrate (void) {
+	lcd_set_home_screen();
+	lcd_update_status("Calibrating");
+	for (int i = 0; i < 5; i++) {
+		nano_wait(1000000000);
+	}
+
+	lcd_update_status("Finished calibration");
+
 }
 /* USER CODE END 4 */
 

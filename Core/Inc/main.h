@@ -43,6 +43,7 @@ extern "C" {
 /* USER CODE BEGIN EC */
 #define MODE_DATA_COL '1'
 #define MODE_STOP_DATA_COL '2'
+#define MODE_CALIBRATE '3'
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -56,6 +57,7 @@ void Error_Handler(void);
 /* USER CODE BEGIN EFP */
 void start_data_collection(void);
 void stop_data_collection(void);
+void dummy_calibrate (void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

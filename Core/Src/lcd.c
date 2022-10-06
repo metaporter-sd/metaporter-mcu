@@ -729,21 +729,22 @@ void lcd_draw_string(u16 x,u16 y, u16 fc, u16 bg, const char *p, u8 size, u8 mod
 void lcd_set_home_screen() {
 	lcd_clear(WHITE);
 	lcd_draw_string(130, 10, BLACK, WHITE, "METAPORTER", 16, 0);
-	lcd_draw_string(10, 60, BLACK, WHITE, "1: Begin data collection.", 16, 0);
-	lcd_draw_string(10, 90, BLACK, WHITE, "2: Stop data collection.", 16, 0);
+	lcd_draw_string(10, 40, BLACK, WHITE, "1: Begin data collection", 16, 0);
+	lcd_draw_string(10, 60, BLACK, WHITE, "2: Stop data collection", 16, 0);
+	lcd_draw_string(10, 80, BLACK, WHITE, "3: Calibrate", 16, 0);
 }
 
 void lcd_update_status(char * status) {
 
 	//lcd_clear(0xffffff);
-	lcd_draw_string(10, 140, BLACK, WHITE, "Status: ", 16, 0);
-	lcd_draw_string(80, 140, BLACK, WHITE, (status), 16, 0);
+	lcd_draw_string(10, 120, BLACK, WHITE, "Status: ", 16, 0);
+	lcd_draw_string(80, 120, BLACK, WHITE, (status), 16, 0);
 
 }
 
 void lcd_show_elapsed_time(int time_elapsed) {
 	char stringy[100];
-	lcd_draw_string(10, 190, BLACK, WHITE, ("Metaporter has been capturing"), 16, 0);
+	lcd_draw_string(10, 160, BLACK, WHITE, ("Metaporter has been capturing"), 16, 0);
 	sprintf(stringy, "data for: %ds", time_elapsed); //convert int time into string
-	lcd_draw_string(10, 210, BLACK, WHITE,  (stringy), 16, 0);
+	lcd_draw_string(10, 180, BLACK, WHITE,  (stringy), 16, 0);
 }
