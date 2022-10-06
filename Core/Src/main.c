@@ -217,7 +217,7 @@ void TIM7_IRQHandler(void) { // TODO: discard last few readings
 			//uart3_send_string(data_string);
 			//tim7_stop();
 			//break;
-					}
+		// }
 		nano_wait(1000000); // 10 ms = 10^7 ns,
 	}
 
@@ -270,7 +270,7 @@ void dummy_calibrate (void) {
 	lcd_update_status("Calibrating");
 
 	// TODO: add actual calibration
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 2; i++) {
 		nano_wait(1000000000);
 	}
 

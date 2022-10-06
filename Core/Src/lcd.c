@@ -5,6 +5,7 @@
 
 #include "stm32f0xx.h"
 #include <stdint.h>
+#include <stdio.h>
 #include "lcd.h"
 #include "utilities.h"
 
@@ -278,16 +279,15 @@ void init_spi1(void) // changes: 11->9; pd14 -> pd2 or pb4
     RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
     GPIOB->MODER &= ~(GPIO_MODER_MODER8 | GPIO_MODER_MODER9);
     GPIOB->MODER |= GPIO_MODER_MODER8_0 | GPIO_MODER_MODER9_0 ;
-    GPIOB->ODR |= GPIO_ODR_8 | GPIO_ODR_9 | GPIO_ODR_14;
+    GPIOB->ODR |= GPIO_ODR_8 | GPIO_ODR_9; // | GPIO_ODR_14
 
     GPIOB->MODER |= GPIO_MODER_MODER3 | GPIO_MODER_MODER5;
     GPIOB->MODER &= ~(GPIO_MODER_MODER3_0 | GPIO_MODER_MODER5_0);
 
     RCC->AHBENR |= RCC_AHBENR_GPIODEN;
     GPIOD->MODER &= ~GPIO_MODER_MODER2;
-    GPIOD->MODER |= GPIO_MODER_MODER2_0 ;
-
-
+    GPIOD->MODER |= GPIO_MODER_MODER2_0;
+    GPIOD->ODR |= GPIO_ODR_2;
 
     RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
     SPI1->CR1 &= ~SPI_CR1_SPE;
