@@ -196,15 +196,18 @@ int8_t i2c1_recv_data(uint8_t devaddr, void *pdata, uint8_t size)
 
 void imu_init(IMU* imu, uint8_t addr, uint8_t mode) {
 	i2c1_init();
-//	init_exti_pb2();
 
 	imu->addr = addr;
 	imu->quat[0] = imu->quat[1] = imu->quat[2] = imu->quat[3] = 0;
 	imu->curr_page = 0;
 	imu->fw_ver = (((uint16_t)0x3) << 8) | ((uint16_t)0x11);
 
-//	imu_set_op_mode(imu, IMU_MODE_CONFIG);
-//	nano_wait(20000000);
+	imu_set_op_mode(imu, IMU_MODE_CONFIG);
+	nano_wait(20000000);
+
+	imu_set_page(imu, 0x00);
+
+	imu_remap_axis(imu); // remap imu axes in CONFIG mode
 //
 //	imu_set_sys_trigger(imu, IMU_RST_SYS); // reset imu
 //	nano_wait(30000000);
@@ -322,6 +325,15 @@ uint8_t imu_get_cal_stat(IMU * imu) {
 	i2c1_recv_data(imu->addr, buffer, sizeof(buffer));
 
 	return (uint8_t)((buffer[0] >> 6) & 0x03); // 0x03 = calibrated; 0x00 = not calibrated
+}
+
+// refer to section 3.4 in BNO055 datasheet for figure & remapping
+void imu_remap_axis(IMU * imu) {
+	uint8_t remap_data[] = {IMU_AXIS_MAP_CONFIG, (((uint8_t)0x01 << 4) | ((uint8_t)0x02 << 2))}; // set z-axis to y-axis & y-axis to z-axis
+	uint8_t sign_data[] = {IMU_AXIS_MAP_SIGN, ((uint8_t)0x01 << 1)}; // set remapped y-axis sign to negative
+
+	i2c1_send_data(imu->addr, remap_data, sizeof(remap_data));
+	i2c1_send_data(imu->addr, sign_data, sizeof(sign_data));
 }
 
 void imu_test(IMU * imu) {

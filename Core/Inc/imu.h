@@ -57,6 +57,8 @@ extern "C" {
 #define IMU_OPR_MODE_ADDR 0x3D
 #define IMU_PWR_MODE_ADDR 0x3E
 #define IMU_SYS_TRIGGER_ADDR 0x3F
+#define IMU_AXIS_MAP_CONFIG 0x41
+#define IMU_AXIS_MAP_SIGN 0x42
 
 // sys_trigger bit shift values
 #define IMU_SELF_TST 1
@@ -82,6 +84,7 @@ void imu_set_page(IMU * imu, uint8_t page);
 void imu_set_sys_trigger(IMU * imu, uint8_t val);
 void imu_get_fw_ver(IMU * imu);
 uint8_t imu_get_cal_stat(IMU * imu);
+void imu_remap_axis(IMU * imu);
 
 void imu_get_quat(IMU * imu);
 
