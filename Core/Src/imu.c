@@ -299,16 +299,29 @@ void imu_get_quat(IMU * imu) {
 }
 
 void imu_get_fw_ver(IMU * imu) {
-	uint8_t reg_addr[] = {0x04}; // set register to read
+	uint8_t reg_addr[] = {IMU_SW_REV_ID_LSB_ADDR}; // set register to read
 
 	i2c1_send_data(imu->addr, reg_addr, sizeof(reg_addr));
 
 	uint8_t buffer[2];
 
-	/* Read fw_ver data (8 bytes) */
+	/* Read fw_ver data (2 bytes) */
 	i2c1_recv_data(imu->addr, buffer, sizeof(buffer));
 
 	imu->fw_ver = (((uint16_t)buffer[1]) << 8) | ((uint16_t)buffer[0]);
+}
+
+uint8_t imu_get_cal_stat(IMU * imu) {
+	uint8_t reg_addr[] = {IMU_CALIB_STAT_ADDR}; // set register to read
+
+	i2c1_send_data(imu->addr, reg_addr, sizeof(reg_addr));
+
+	uint8_t buffer[1];
+
+	/* Read sys_cal_stat (1 byte) */
+	i2c1_recv_data(imu->addr, buffer, sizeof(buffer));
+
+	return (uint8_t)((buffer[0] >> 6) & 0x03); // 0x03 = calibrated; 0x00 = not calibrated
 }
 
 void imu_test(IMU * imu) {

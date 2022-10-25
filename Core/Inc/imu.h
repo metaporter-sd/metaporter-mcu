@@ -48,10 +48,12 @@ extern "C" {
 #define IMU_POWER_MODE_NORMAL 0x00
 
 // imu registers
+#define IMU_SW_REV_ID_LSB_ADDR 0x04
 #define IMU_PAGE_ID_ADDR 0x07
 #define IMU_INT_MSK 0x0F
 #define IMU_INT_EN 0x10
 #define IMU_QUATERNION_DATA_W_LSB_ADDR 0x20
+#define IMU_CALIB_STAT_ADDR 0x35
 #define IMU_OPR_MODE_ADDR 0x3D
 #define IMU_PWR_MODE_ADDR 0x3E
 #define IMU_SYS_TRIGGER_ADDR 0x3F
@@ -79,6 +81,7 @@ void imu_set_power_mode(IMU * imu, uint8_t mode);
 void imu_set_page(IMU * imu, uint8_t page);
 void imu_set_sys_trigger(IMU * imu, uint8_t val);
 void imu_get_fw_ver(IMU * imu);
+uint8_t imu_get_cal_stat(IMU * imu);
 
 void imu_get_quat(IMU * imu);
 
