@@ -183,12 +183,15 @@ void TIM6_DAC_IRQHandler(void) {
 
     // set mode based on key pressed
     if (key_pressed == MODE_DATA_COL) {
-    	/*
-    	if (imu_get_cal_stat(imu) == 0x00) {
+
+    	if (imu_get_cal_stat(&imu) == 0x00) {
+    		//char data[25];
     		lcd_update_status("Calibrating");
-    	   	while(imu_get_cal_stat(imu) == 0x00); // poll for calibration to be complete?
+    		//sprintf(data,"Calibration status: %d", imu_get_cal_stat(&imu));
+    		//uart3_send_string(data);
+    	   	while(imu_get_cal_stat(&imu) == 0x00); // poll for calibration to be complete?
     	}
-        */
+
         start_data_collection(); // start to start is safe
     } else if (key_pressed == MODE_STOP_DATA_COL) {
     	stop_data_collection();
