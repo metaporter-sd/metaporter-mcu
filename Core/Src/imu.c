@@ -329,8 +329,8 @@ uint8_t imu_get_cal_stat(IMU * imu) {
 
 // refer to section 3.4 in BNO055 datasheet for figure & remapping
 void imu_remap_axis(IMU * imu) {
-	uint8_t remap_data[] = {IMU_AXIS_MAP_CONFIG, (((uint8_t)0x01 << 4) | ((uint8_t)0x02 << 2))}; // set z-axis to y-axis & y-axis to z-axis
-	uint8_t sign_data[] = {IMU_AXIS_MAP_SIGN, ((uint8_t)0x01 << 1)}; // set remapped y-axis sign to negative
+	uint8_t remap_data[] = {IMU_AXIS_MAP_CONFIG, (((uint8_t)0x01 << 4) | ((uint8_t)0x02 << 2) | ((uint8_t)0x00))}; // set z-axis to y-axis & y-axis to z-axis
+	uint8_t sign_data[] = {IMU_AXIS_MAP_SIGN, (((uint8_t)0x01 << 2) | ((uint8_t)0x01 << 1) | ((uint8_t)0x01))}; // set all remapped axes sign to negative
 
 	i2c1_send_data(imu->addr, remap_data, sizeof(remap_data));
 	i2c1_send_data(imu->addr, sign_data, sizeof(sign_data));
